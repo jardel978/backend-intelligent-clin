@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ConsultaService implements IGenericService<Consulta, Long> {
+public class ConsultaService {
 
     @Autowired
     private IConsultaRepository consultaRepository;
@@ -29,7 +29,6 @@ public class ConsultaService implements IGenericService<Consulta, Long> {
     @Autowired
     private IUsuarioRepository usuarioRepository;
 
-    @Override
     public Consulta salvar(Consulta consulta) {
         Paciente paciente = pacienteRepository.findById(consulta.getPaciente().getId()).isPresent()
                 ? pacienteRepository.getById(consulta.getPaciente().getId()) : null;
@@ -50,17 +49,14 @@ public class ConsultaService implements IGenericService<Consulta, Long> {
             throw new RuntimeException("Certifique-se de que não existem campos vazios.");
     }
 
-    @Override
     public Optional<Consulta> buscarPorId(Long id) {
         return consultaRepository.findById(id);
     }
 
-    @Override
     public List<Consulta> buscarTodos() {
         return consultaRepository.findAll();
     }
 
-    @Override
     public void excluirPorId(Long id) {
         consultaRepository.deleteById(id);
     }

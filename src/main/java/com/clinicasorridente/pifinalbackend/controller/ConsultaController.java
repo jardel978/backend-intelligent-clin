@@ -68,8 +68,7 @@ public class ConsultaController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Transactional
-    public void atualizar(@Valid @PathVariable("id") Long id, @RequestBody Consulta consulta, BindingResult bgresult) {
+    public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody Consulta consulta, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 

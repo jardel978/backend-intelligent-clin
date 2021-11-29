@@ -63,7 +63,7 @@ public class PacienteController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void atualizar(@Valid @PathVariable("id") Long id, @RequestBody Paciente paciente, BindingResult bgresult) {
+    public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody Paciente paciente, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 

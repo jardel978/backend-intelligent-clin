@@ -43,16 +43,16 @@ public class UsuarioController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UsuarioDTO> buscarTodos() {
-        List<Usuario> lista = usuarioService.buscarTodos();
-        List<UsuarioDTO> listaDTO = lista.stream().map(usuario -> UsuarioDTO.builder()
-                .id(usuario.getId())
-                .nome(usuario.getNome())
-                .email(usuario.getEmail())
-                .acesso(usuario.getAcesso()).build()
-        ).collect(Collectors.toList());
-        return listaDTO;
-//        return usuarioService.buscarTodos();
+    public List<Usuario> buscarTodos() {
+//        List<Usuario> lista = usuarioService.buscarTodos();
+//        List<UsuarioDTO> listaDTO = lista.stream().map(usuario -> UsuarioDTO.builder()
+//                .id(usuario.getId())
+//                .nome(usuario.getNome())
+//                .email(usuario.getEmail())
+//                .acesso(usuario.getAcesso()).build()
+//        ).collect(Collectors.toList());
+//        return listaDTO;
+        return usuarioService.buscarTodos();
     }
 
     @DeleteMapping("/{id}")
@@ -69,7 +69,10 @@ public class UsuarioController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void atualizar(@PathVariable("id") Long id, @RequestBody Usuario usuario) {
+    public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody Usuario usuario, BindingResult bgresult) {
+        if (bgresult.hasErrors())
+            throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
+
         usuarioService.buscarPorId(id)
                 .map(usuarioDaBase -> {
                     modelMapper.map(usuario, usuarioDaBase);

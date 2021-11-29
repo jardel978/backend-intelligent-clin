@@ -10,27 +10,23 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UsuarioService implements IGenericService<Usuario, Long> {
+public class UsuarioService {
 
     @Autowired
     private IUsuarioRepository usuarioRepository;
 
-    @Override
     public Usuario salvar(Usuario usuario) {
         return usuarioRepository.save(usuario);
     }
 
-    @Override
     public Optional<Usuario> buscarPorId(Long id) {
         return usuarioRepository.findById(id);
     }
 
-    @Override
     public List<Usuario> buscarTodos() {
         return usuarioRepository.findAll();
     }
 
-    @Override
     public void excluirPorId(Long id) {
         try {
             usuarioRepository.deleteById(id);

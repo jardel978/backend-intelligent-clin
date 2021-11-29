@@ -1,13 +1,16 @@
 package com.clinicasorridente.pifinalbackend.controller;
 
+import com.clinicasorridente.pifinalbackend.controller.exception.ConstraintException;
 import com.clinicasorridente.pifinalbackend.entity.Dentista;
 import com.clinicasorridente.pifinalbackend.service.DentistaService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,7 +25,10 @@ public class DentistaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Dentista salvar(@RequestBody Dentista dentista) {
+    public Dentista salvar(@Valid @RequestBody Dentista dentista, BindingResult bgresult) {
+        if (bgresult.hasErrors())
+            throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
+
         return dentistaService.salvar(dentista);
     }
 
@@ -54,7 +60,10 @@ public class DentistaController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void atualizar(@PathVariable("id") Long id, @RequestBody Dentista dentista) {
+    public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody Dentista dentista, BindingResult bgresult) {
+        if (bgresult.hasErrors())
+            throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
+
         dentistaService.buscarPorId(id)
                 .map(dentistaDaBase -> {
                     modelMapper.map(dentista, dentistaDaBase);

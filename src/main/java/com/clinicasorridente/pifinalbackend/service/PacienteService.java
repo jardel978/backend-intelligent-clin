@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PacienteService implements IGenericService<Paciente, Long> {
+public class PacienteService {
 
     @Autowired
     private IPacienteRepository pacienteRepository;
@@ -20,22 +20,18 @@ public class PacienteService implements IGenericService<Paciente, Long> {
     @Autowired
     private IEnderecoRepository enderecoRepository;
 
-    @Override
     public Paciente salvar(Paciente paciente) {
             return pacienteRepository.save(paciente);
     }
 
-    @Override
     public Optional<Paciente> buscarPorId(Long id) {
         return pacienteRepository.findById(id);
     }
 
-    @Override
     public List<Paciente> buscarTodos() {
         return pacienteRepository.findAll();
     }
 
-    @Override
     public void excluirPorId(Long id) {
         try {
             pacienteRepository.deleteById(id);

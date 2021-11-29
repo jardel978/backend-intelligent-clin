@@ -12,27 +12,23 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class DentistaService implements IGenericService<Dentista, Long> {
+public class DentistaService {
 
     @Autowired
     private IDentistaRepository dentistaRepository;
 
-    @Override
     public Dentista salvar(Dentista dentista) {
         return dentistaRepository.save(dentista);
     }
 
-    @Override
     public Optional<Dentista> buscarPorId(Long id) {
         return dentistaRepository.findById(id);
     }
 
-    @Override
     public List<Dentista> buscarTodos() {
         return dentistaRepository.findAll();
     }
 
-    @Override
     public void excluirPorId(Long id) {
         try {
             dentistaRepository.deleteById(id);

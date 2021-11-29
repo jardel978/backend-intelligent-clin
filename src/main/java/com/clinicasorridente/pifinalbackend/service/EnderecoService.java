@@ -9,28 +9,24 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class EnderecoService implements IGenericService<Endereco, Long> {
+public class EnderecoService {
 
     @Autowired
     private IEnderecoRepository enderecoRepository;
 
 
-    @Override
     public Endereco salvar(Endereco endereco) {
         return enderecoRepository.save(endereco);
     }
 
-    @Override
     public Optional<Endereco> buscarPorId(Long id) {
         return enderecoRepository.findById(id);
     }
 
-    @Override
     public List<Endereco> buscarTodos() {
         return enderecoRepository.findAll();
     }
 
-    @Override
     public void excluirPorId(Long id) {
         enderecoRepository.deleteById(id);
     }
