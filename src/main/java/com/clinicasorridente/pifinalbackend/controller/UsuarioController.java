@@ -73,14 +73,22 @@ public class UsuarioController {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
-        usuarioService.buscarPorId(id)
-                .map(usuarioDaBase -> {
-                    modelMapper.map(usuario, usuarioDaBase);
-                    usuarioService.salvar(usuarioDaBase);
-                    return Void.TYPE;
-                }).orElseThrow(() ->
+//        usuarioService.buscarPorId(id)
+//                .map(usuarioDaBase -> {
+//                    modelMapper.map(usuario, usuarioDaBase);
+//                    usuarioService.salvar(usuarioDaBase);
+//                    return Void.TYPE;
+//                }).orElseThrow(() ->
+//                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.")
+//                );
+        Usuario usuarioDaBase = usuarioService.buscarPorId(id).orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.")
                 );
+        usuarioDaBase.setNome(usuario.getNome());
+        usuarioDaBase.setEmail(usuario.getEmail());
+        usuarioDaBase.setSenha(usuario.getSenha());
+        usuarioDaBase.setAcesso(usuario.getAcesso());
+        usuarioService.salvar(usuarioDaBase);
     }
 
 }

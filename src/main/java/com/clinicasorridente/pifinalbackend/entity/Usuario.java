@@ -1,10 +1,8 @@
 package com.clinicasorridente.pifinalbackend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,7 +12,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -25,7 +24,7 @@ public class Usuario implements Serializable {
 
     @Id
     @Column(name = "usuario_id")
-@GeneratedValue(generator = "usuario", strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "usuario", strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(name = "usuario_nome")
@@ -46,6 +45,7 @@ public class Usuario implements Serializable {
     @Enumerated(value = EnumType.STRING)
     private CategoriaUsuario acesso;
 
+//    @JsonManagedReference
     @JsonIgnore
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Set<Consulta> consultas = new HashSet<>();

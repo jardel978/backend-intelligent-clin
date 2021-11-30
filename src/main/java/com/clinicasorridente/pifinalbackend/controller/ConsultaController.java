@@ -72,14 +72,23 @@ public class ConsultaController {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
-        consultaService.buscarPorId(id)
-                .map(consultaDaBase -> {
-                    modelMapper.map(consulta, consultaDaBase);
-                    consultaService.salvar(consultaDaBase);
-                    return Void.TYPE;
-                }).orElseThrow(() ->
+//        consultaService.buscarPorId(id)
+//                .map(consultaDaBase -> {
+//                    modelMapper.map(consulta, consultaDaBase);
+//                    consultaService.salvar(consultaDaBase);
+//                    return Void.TYPE;
+//                }).orElseThrow(() ->
+//                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada.")
+//                );
+        Consulta consultaDaBase = consultaService.buscarPorId(id).orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada.")
                 );
+        consultaDaBase.setPaciente(consulta.getPaciente());
+        consultaDaBase.setDentista(consulta.getDentista());
+        consultaDaBase.setUsuario(consulta.getUsuario());
+        consultaDaBase.setDataConsulta(consulta.getDataConsulta());
+        consultaDaBase.setHoraConsulta(consulta.getHoraConsulta());
+        consultaService.salvar(consultaDaBase);
     }
 
     private ConsultaDTO converterDTO(Consulta consulta) {

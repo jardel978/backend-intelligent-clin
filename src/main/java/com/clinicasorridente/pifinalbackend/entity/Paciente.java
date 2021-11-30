@@ -2,10 +2,9 @@ package com.clinicasorridente.pifinalbackend.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.*;
+
 import javax.validation.constraints.*;
 
 
@@ -15,7 +14,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -50,7 +50,8 @@ public class Paciente implements Serializable {
     @JoinColumn(name = "endereco_id", foreignKey = @ForeignKey(name = "fk_endereco"))
     private Endereco endereco;
 
-    @JsonIgnore
+//    @JsonManagedReference
     @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Consulta> consultas = new HashSet<>();
 }

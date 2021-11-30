@@ -10,6 +10,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.EntityManager;
+import javax.swing.text.html.parser.Entity;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -22,6 +25,9 @@ public class DentistaController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    EntityManager entityManager;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -59,20 +65,25 @@ public class DentistaController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
+    @ResponseStatus(HttpStatus.OK)
     public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody Dentista dentista, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
-        dentistaService.buscarPorId(id)
-                .map(dentistaDaBase -> {
-                    modelMapper.map(dentista, dentistaDaBase);
-                    dentistaService.salvar(dentistaDaBase);
-                    return Void.TYPE;
-                }).orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Dentista não encontrado.")
-                );
-
+//        dentistaService.buscarPorId(id)
+//                .map(dentistaDaBase -> {
+//                    modelMapper.map(dentista, dentistaDaBase);
+//                    dentistaService.salvar(dentistaDaBase);
+//                    return Void.TYPE;
+//                }).orElseThrow(() ->
+//                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Dentista não encontrado.")
+//                );
+        try {
+            dentistaService.atualizar(id, dentista);
+        } catch (ResponseStatusException e) {
+            new ResponseStatusException(HttpStatus.NOT_FOUND, "Dentista não encontrado.");
+        }
     }
 
 }

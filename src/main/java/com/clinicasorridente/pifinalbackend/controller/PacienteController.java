@@ -21,9 +21,6 @@ public class PacienteController {
     @Autowired
     private PacienteService pacienteService;
 
-//    @Autowired
-//    private EnderecoService enderecoService;
-
     @Autowired
     private ModelMapper modelMapper;
 
@@ -62,19 +59,29 @@ public class PacienteController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody Paciente paciente, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
-        pacienteService.buscarPorId(id)
-                .map((pacienteDaBase) -> {
-                    modelMapper.map(paciente, pacienteDaBase);
-                    pacienteService.salvar(pacienteDaBase);
-                    return Void.TYPE;
-                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Paciente não encontrado")
-                );
+//        pacienteService.buscarPorId(id)
+//                .map((pacienteDaBase) -> {
+//                    modelMapper.map(paciente, pacienteDaBase);
+//                    pacienteService.salvar(pacienteDaBase);
+//                    return Void.TYPE;
+//                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+//                        "Paciente não encontrado")
+//                );
+        Paciente pacienteDaBase = pacienteService.buscarPorId(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
+        pacienteDaBase.setNome(paciente.getNome());
+        pacienteDaBase.setSobrenome(paciente.getSobrenome());
+        pacienteDaBase.setCpf(paciente.getCpf());
+        pacienteDaBase.setDataCadastro(paciente.getDataCadastro());
+        pacienteDaBase.setEndereco(paciente.getEndereco());
+        pacienteDaBase.setConsultas(paciente.getConsultas());
+
+        pacienteService.salvar(pacienteDaBase);
     }
 
 }

@@ -54,14 +54,23 @@ public class EnderecoController {
 
     @PutMapping("/{id}")
     public void atualizar(@PathVariable("id") Long id, @RequestBody Endereco endereco) {
-        enderecoService.buscarPorId(id)
-                .map(enderecoDaBase -> {
-                    modelMapper.map(endereco, enderecoDaBase);
-                    enderecoService.salvar(enderecoDaBase);
-                    return Void.TYPE;
-                }).orElseThrow(() ->
+//        enderecoService.buscarPorId(id)
+//                .map(enderecoDaBase -> {
+//                    modelMapper.map(endereco, enderecoDaBase);
+//                    enderecoService.salvar(enderecoDaBase);
+//                    return Void.TYPE;
+//                }).orElseThrow(() ->
+//                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado.")
+//                );
+        Endereco enderecoDaBase = enderecoService.buscarPorId(id).orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado.")
                 );
+        enderecoDaBase.setRua(endereco.getRua());
+        enderecoDaBase.setNumero(endereco.getNumero());
+        enderecoDaBase.setCidade(endereco.getCidade());
+        enderecoDaBase.setEstado(endereco.getEstado());
+//        enderecoDaBase.setPacientes(endereco.getPacientes());
+        enderecoService.salvar(enderecoDaBase);
     }
 
 }
