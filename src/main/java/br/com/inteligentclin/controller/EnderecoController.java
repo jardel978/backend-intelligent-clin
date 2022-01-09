@@ -1,7 +1,7 @@
-package com.clinicasorridente.pifinalbackend.controller;
+package br.com.inteligentclin.controller;
 
-import com.clinicasorridente.pifinalbackend.entity.Endereco;
-import com.clinicasorridente.pifinalbackend.service.EnderecoService;
+import br.com.inteligentclin.entity.Endereco;
+import br.com.inteligentclin.service.EnderecoService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

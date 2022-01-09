@@ -1,10 +1,9 @@
-package com.clinicasorridente.pifinalbackend.controller;
+package br.com.inteligentclin.controller;
 
-import com.clinicasorridente.pifinalbackend.controller.exception.ConstraintException;
-import com.clinicasorridente.pifinalbackend.entity.Paciente;
-import com.clinicasorridente.pifinalbackend.service.EnderecoService;
-import com.clinicasorridente.pifinalbackend.service.PacienteService;
-import org.modelmapper.ModelMapper;
+import br.com.inteligentclin.controller.exception.ConstraintException;
+import br.com.inteligentclin.dtos.pacienteDTO.PacienteModelDTO;
+import br.com.inteligentclin.entity.Paciente;
+import br.com.inteligentclin.service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -15,21 +14,22 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController()
-@RequestMapping("/paciente")
+@RequestMapping("/pacientes")
 public class PacienteController {
 
     @Autowired
     private PacienteService pacienteService;
 
-    @Autowired
-    private ModelMapper modelMapper;
+//    @Autowired
+//    private ModelMapper modelMapper;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Paciente salvar(@Valid @RequestBody Paciente paciente, BindingResult bgresult) {
+    public PacienteModelDTO salvar(@Valid @RequestBody PacienteModelDTO pacienteDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
-        return pacienteService.salvar(paciente);
+
+            return pacienteService.salvar(pacienteDTO);
     }
 
     @GetMapping("/{id}")
@@ -58,31 +58,36 @@ public class PacienteController {
                 );
     }
 
-    @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody Paciente paciente, BindingResult bgresult) {
-        if (bgresult.hasErrors())
-            throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
-
-//        pacienteService.buscarPorId(id)
-//                .map((pacienteDaBase) -> {
-//                    modelMapper.map(paciente, pacienteDaBase);
-//                    pacienteService.salvar(pacienteDaBase);
-//                    return Void.TYPE;
-//                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-//                        "Paciente não encontrado")
-//                );
-        Paciente pacienteDaBase = pacienteService.buscarPorId(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
-        pacienteDaBase.setNome(paciente.getNome());
-        pacienteDaBase.setSobrenome(paciente.getSobrenome());
-        pacienteDaBase.setCpf(paciente.getCpf());
-        pacienteDaBase.setDataCadastro(paciente.getDataCadastro());
-        pacienteDaBase.setEndereco(paciente.getEndereco());
-        pacienteDaBase.setConsultas(paciente.getConsultas());
-
-        pacienteService.salvar(pacienteDaBase);
-    }
+//    @PutMapping("/{id}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody Paciente paciente, BindingResult bgresult) {
+//        if (bgresult.hasErrors())
+//            throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
+//
+////        pacienteService.buscarPorId(id)
+////                .map((pacienteDaBase) -> {
+////                    modelMapper.map(paciente, pacienteDaBase);
+////                    pacienteService.salvar(pacienteDaBase);
+////                    return Void.TYPE;
+////                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+////                        "Paciente não encontrado")
+////                );
+//        Paciente pacienteDaBase = pacienteService.buscarPorId(id).orElseThrow(() ->
+//                new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
+//        pacienteDaBase.setNome(paciente.getNome());
+//        pacienteDaBase.setSobrenome(paciente.getSobrenome());
+//        pacienteDaBase.setDataCadastro(paciente.getDataCadastro());
+//        pacienteDaBase.setCpf(paciente.getCpf());
+//        pacienteDaBase.setEmail(paciente.getEmail());
+//        pacienteDaBase.setTelefone(paciente.getTelefone());
+//        pacienteDaBase.setDataNascimento(paciente.getDataNascimento());
+//        pacienteDaBase.setEndereco(paciente.getEndereco());
+//        pacienteDaBase.setConsultas(paciente.getConsultas());
+//        pacienteDaBase.setProntuario(paciente.getProntuario());
+//        pacienteDaBase.setSexo(paciente.getSexo());
+//
+//        pacienteService.salvar(pacienteDaBase);
+//    }
 
 }
 

@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class JardelSilvaT3PiFinalBackendIApplication {
+public class InteligentClinApplication {
 
 	@Bean
 	public ModelMapper modelMapper() {
@@ -16,7 +16,7 @@ public class JardelSilvaT3PiFinalBackendIApplication {
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(JardelSilvaT3PiFinalBackendIApplication.class, args);
+		SpringApplication.run(InteligentClinApplication.class, args);
 	}
 
 }

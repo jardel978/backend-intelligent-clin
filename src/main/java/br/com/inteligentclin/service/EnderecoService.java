@@ -1,7 +1,7 @@
-package com.clinicasorridente.pifinalbackend.service;
+package br.com.inteligentclin.service;
 
-import com.clinicasorridente.pifinalbackend.entity.Endereco;
-import com.clinicasorridente.pifinalbackend.repository.IEnderecoRepository;
+import br.com.inteligentclin.entity.Endereco;
+import br.com.inteligentclin.repository.IEnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
-package com.clinicasorridente.pifinalbackend.entity;
+package br.com.inteligentclin.entity;
 
-import com.clinicasorridente.pifinalbackend.entity.enums.Sexo;
+import br.com.inteligentclin.entity.enums.Sexo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -8,6 +8,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,8 +32,10 @@ public class Paciente extends Pessoa implements Serializable {
     private Long id;
 
     @Column(name = "data_nascimento")
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    private Date dataNascimento = new Date(System.currentTimeMillis());
+    private LocalDate dataNascimento;
+
+    @Transient
+    private Idade idade;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "endereco_id", foreignKey = @ForeignKey(name = "fk_endereco"))
@@ -48,4 +52,5 @@ public class Paciente extends Pessoa implements Serializable {
 
     @Enumerated(value = EnumType.STRING)
     private Sexo sexo;
+
 }

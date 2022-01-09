@@ -1,13 +1,13 @@
-package com.clinicasorridente.pifinalbackend.service;
+package br.com.inteligentclin.service;
 
-import com.clinicasorridente.pifinalbackend.entity.Consulta;
-import com.clinicasorridente.pifinalbackend.entity.Dentista;
-import com.clinicasorridente.pifinalbackend.entity.Paciente;
-import com.clinicasorridente.pifinalbackend.entity.Usuario;
-import com.clinicasorridente.pifinalbackend.repository.IConsultaRepository;
-import com.clinicasorridente.pifinalbackend.repository.IDentistaRepository;
-import com.clinicasorridente.pifinalbackend.repository.IPacienteRepository;
-import com.clinicasorridente.pifinalbackend.repository.IUsuarioRepository;
+import br.com.inteligentclin.repository.IConsultaRepository;
+import br.com.inteligentclin.entity.Consulta;
+import br.com.inteligentclin.entity.Dentista;
+import br.com.inteligentclin.entity.Paciente;
+import br.com.inteligentclin.entity.Usuario;
+import br.com.inteligentclin.repository.IDentistaRepository;
+import br.com.inteligentclin.repository.IPacienteRepository;
+import br.com.inteligentclin.repository.IUsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

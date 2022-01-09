@@ -1,7 +1,6 @@
-package com.clinicasorridente.pifinalbackend.entity;
+package br.com.inteligentclin.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;

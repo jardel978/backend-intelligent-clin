@@ -1,4 +1,4 @@
-package br.com.inteligentclin.dtos;
+package br.com.inteligentclin.dtos.enderecoDTO;
 
 import br.com.inteligentclin.entity.Paciente;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import java.util.Set;
 @Builder
 @Getter
 @Setter
-public class EnderecoDTO {
+public class EnderecoModelDTO {
 
     private Long id;
     private String rua;

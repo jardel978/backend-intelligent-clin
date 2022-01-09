@@ -1,8 +1,7 @@
 package br.com.inteligentclin.dtos.dentistaDTO;
 
-import br.com.inteligentclin.dtos.PessoaModelDTO;
+import br.com.inteligentclin.dtos.PessoaSummaryDTO;
 import br.com.inteligentclin.entity.Consulta;
-import br.com.inteligentclin.entity.Prontuario;
 import br.com.inteligentclin.entity.enums.Especialidade;
 import lombok.*;
 
@@ -16,7 +15,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DentistaModelDTO extends PessoaModelDTO implements Serializable {
+public class DentistaSummaryDTO extends PessoaSummaryDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -25,9 +24,6 @@ public class DentistaModelDTO extends PessoaModelDTO implements Serializable {
 
     private List<Especialidade> especialidades;
 
-//    @JsonIgnore
     private Set<Consulta> consultas;
-
-    private Set<Prontuario> prontuarios;
 
 }

@@ -1,19 +1,16 @@
-package com.clinicasorridente.pifinalbackend.controller;
+package br.com.inteligentclin.controller;
 
-import com.clinicasorridente.pifinalbackend.controller.exception.ConstraintException;
-import com.clinicasorridente.pifinalbackend.dtos.ConsultaDTO;
-import com.clinicasorridente.pifinalbackend.entity.Consulta;
-import com.clinicasorridente.pifinalbackend.entity.Usuario;
-import com.clinicasorridente.pifinalbackend.service.ConsultaService;
+import br.com.inteligentclin.controller.exception.ConstraintException;
+import br.com.inteligentclin.dtos.consultaDTO.ConsultaModelDTO;
+import br.com.inteligentclin.entity.Consulta;
+import br.com.inteligentclin.service.ConsultaService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,13 +27,13 @@ public class ConsultaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ConsultaDTO salvar(@Valid @RequestBody Consulta consulta, BindingResult bgresult) {
+    public ConsultaModelDTO salvar(@Valid @RequestBody Consulta consulta, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
         consultaService.salvar(consulta);
-        ConsultaDTO consultaDTO = converterDTO(consulta);
-        return consultaDTO;
+        ConsultaModelDTO consultaModelDTO = converterDTO(consulta);
+        return consultaModelDTO;
     }
 
     @GetMapping("/{id}")
@@ -49,9 +46,9 @@ public class ConsultaController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ConsultaDTO> buscarTodos() {
+    public List<ConsultaModelDTO> buscarTodos() {
         List<Consulta> lista = consultaService.buscarTodos();
-        List<ConsultaDTO> listaDTO = lista.stream().map(consulta -> converterDTO(consulta)).collect(Collectors.toList());
+        List<ConsultaModelDTO> listaDTO = lista.stream().map(consulta -> converterDTO(consulta)).collect(Collectors.toList());
         return listaDTO;
     }
 
@@ -91,8 +88,8 @@ public class ConsultaController {
         consultaService.salvar(consultaDaBase);
     }
 
-    private ConsultaDTO converterDTO(Consulta consulta) {
-        return ConsultaDTO.builder()
+    private ConsultaModelDTO converterDTO(Consulta consulta) {
+        return ConsultaModelDTO.builder()
                 .id(consulta.getId())
                 .idPaciente(consulta.getPaciente().getId())
                 .idDentista(consulta.getDentista().getId())

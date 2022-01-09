@@ -1,6 +1,6 @@
-package com.clinicasorridente.pifinalbackend.repository;
+package br.com.inteligentclin.repository;
 
-import com.clinicasorridente.pifinalbackend.entity.Usuario;
+import br.com.inteligentclin.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IUsuarioRepository extends JpaRepository<Usuario, Long> {

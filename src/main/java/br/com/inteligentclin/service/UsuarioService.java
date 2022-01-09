@@ -1,7 +1,7 @@
-package com.clinicasorridente.pifinalbackend.service;
+package br.com.inteligentclin.service;
 
-import com.clinicasorridente.pifinalbackend.entity.Usuario;
-import com.clinicasorridente.pifinalbackend.repository.IUsuarioRepository;
+import br.com.inteligentclin.entity.Usuario;
+import br.com.inteligentclin.repository.IUsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

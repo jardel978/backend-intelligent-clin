@@ -1,55 +1,88 @@
-package com.clinicasorridente.pifinalbackend.controller;
+package br.com.inteligentclin.controller;
 
-import com.clinicasorridente.pifinalbackend.controller.exception.ConstraintException;
-import com.clinicasorridente.pifinalbackend.entity.Dentista;
-import com.clinicasorridente.pifinalbackend.service.DentistaService;
-import org.modelmapper.ModelMapper;
+import br.com.inteligentclin.controller.exception.ConstraintException;
+import br.com.inteligentclin.dtos.dentistaDTO.DentistaModelDTO;
+import br.com.inteligentclin.dtos.dentistaDTO.DentistaSummaryDTO;
+import br.com.inteligentclin.entity.enums.Especialidade;
+import br.com.inteligentclin.service.DentistaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.persistence.EntityManager;
-import javax.swing.text.html.parser.Entity;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
-@RequestMapping("/dentista")
+@RequestMapping("/dentistas")
 public class DentistaController {
 
     @Autowired
     private DentistaService dentistaService;
 
-    @Autowired
-    private ModelMapper modelMapper;
 
     @PostMapping
+    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
-    public Dentista salvar(@Valid @RequestBody Dentista dentista, BindingResult bgresult) {
+    public DentistaModelDTO salvar(@Valid @RequestBody DentistaModelDTO dentistaDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
-        return dentistaService.salvar(dentista);
+        return dentistaService.salvar(dentistaDTO);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Dentista buscarPorId(@PathVariable("id") Long id) {
-        return dentistaService.buscarPorId(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Dentista não encontrado.")
-        );
+    public DentistaModelDTO buscarPorId(@PathVariable("id") Long id) {
+        return dentistaService.buscarPorId(id).get();
     }
 
+    //     http://localhost:8080/dentistas?size=1&page=0&custom?nome=nome&sobrenome=sobrenome (ou apenas nome, ou id,
+    //     cpf...)
+    @GetMapping("/custom")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<DentistaModelDTO> buscarCustomizado(
+            Pageable pageable,
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "nome", required = false) String nome,
+            @RequestParam(value = "sobrenome", required = false) String sobrenome,
+            @RequestParam(value = "cpf", required = false) String cpf) {
+        return dentistaService.buscarCustomizado(pageable, id, nome, sobrenome, cpf);
+    }
+
+    //    http://localhost:8080/dentistas/matriculas?matricula=153246
+    @GetMapping("/matriculas")
+    @ResponseStatus(HttpStatus.OK)
+    public DentistaModelDTO buscarPorMatricula(@RequestParam(value = "matricula") String numMatricula) {
+        return dentistaService.buscarPorMatricula(numMatricula);
+    }
+
+    //    http://localhost:8080/dentistas?size=2&page=0&especialidades?especialidade=clinico
+    @GetMapping("/especialidades")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<DentistaSummaryDTO> buscarPorEspecialidades(
+            Pageable pageable,
+            @RequestParam(value = "especialidade") String nomeEspecialidade) {
+        try {
+            Especialidade stringParaEnumEspecialidade = Especialidade.valueOf(nomeEspecialidade.toUpperCase());
+            return dentistaService.buscarPorEspecialidades(pageable, stringParaEnumEspecialidade);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Nenhum Dentista registrado possuí a especialidade informada.");
+        }
+    }
+
+    //    http://localhost:8080/dentistas?size=quantidade&page=numPágs
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Dentista> buscarTodos() {
-        return dentistaService.buscarTodos();
+    public Page<DentistaSummaryDTO> buscarTodos(Pageable pageable) {
+        return dentistaService.buscarTodos(pageable);
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluirPorId(@PathVariable("id") Long id) {
         dentistaService.buscarPorId(id)
@@ -62,26 +95,18 @@ public class DentistaController {
     }
 
     @PutMapping("/{id}")
-    @Transactional//colocar isso em todos os métodos de excluir, salvar e atualizar (esse comentário = última
-    // modificação)
+    @Transactional//colocar isso em todos os métodos de excluir, salvar e atualizar (esse comentário = última modificação)
     @ResponseStatus(HttpStatus.OK)//mudar para esse httpStatus os outros métodos de delete, save, update
-    public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody Dentista dentista, BindingResult bgresult) {
+    public void atualizar(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody DentistaModelDTO dentistaDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
-//        dentistaService.buscarPorId(id)
-//                .map(dentistaDaBase -> {
-//                    modelMapper.map(dentista, dentistaDaBase);
-//                    dentistaService.salvar(dentistaDaBase);
-//                    return Void.TYPE;
-//                }).orElseThrow(() ->
-//                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Dentista não encontrado.")
-//                );
         try {
-            dentistaService.atualizar(id, dentista);
+            dentistaService.atualizar(id, dentistaDTO);
         } catch (ResponseStatusException e) {
             new ResponseStatusException(HttpStatus.NOT_FOUND, "Dentista não encontrado.");
         }
     }
-
 }

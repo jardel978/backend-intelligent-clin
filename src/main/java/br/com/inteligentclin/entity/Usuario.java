@@ -1,6 +1,6 @@
-package com.clinicasorridente.pifinalbackend.entity;
+package br.com.inteligentclin.entity;
 
-import com.clinicasorridente.pifinalbackend.entity.enums.Cargo;
+import br.com.inteligentclin.entity.enums.Cargo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 

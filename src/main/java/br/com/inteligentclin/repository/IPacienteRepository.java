@@ -1,13 +1,10 @@
-package com.clinicasorridente.pifinalbackend.repository;
+package br.com.inteligentclin.repository;
 
-import com.clinicasorridente.pifinalbackend.entity.Paciente;
+import br.com.inteligentclin.entity.Paciente;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
 
 public interface IPacienteRepository extends JpaRepository<Paciente, Long> {
 
-    Paciente findByCpf(String cpf);
+//    Paciente findByCpf(String cpf);
 
 }

@@ -1,4 +1,4 @@
-package com.clinicasorridente.pifinalbackend.controller.exception;
+package br.com.inteligentclin.controller.exception;
 
 public class ConstraintException extends RuntimeException {
 

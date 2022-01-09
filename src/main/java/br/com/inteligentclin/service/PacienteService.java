@@ -1,13 +1,19 @@
-package com.clinicasorridente.pifinalbackend.service;
+package br.com.inteligentclin.service;
 
-import com.clinicasorridente.pifinalbackend.entity.Paciente;
-import com.clinicasorridente.pifinalbackend.repository.IEnderecoRepository;
-import com.clinicasorridente.pifinalbackend.repository.IPacienteRepository;
-import com.clinicasorridente.pifinalbackend.service.exception.DadoExistenteException;
+import br.com.inteligentclin.dtos.converters.PacienteModelMapperConverter;
+import br.com.inteligentclin.dtos.pacienteDTO.PacienteModelDTO;
+import br.com.inteligentclin.entity.Idade;
+import br.com.inteligentclin.entity.Paciente;
+import br.com.inteligentclin.repository.IEnderecoRepository;
+import br.com.inteligentclin.repository.IPacienteRepository;
+import br.com.inteligentclin.repository.PessoaCustomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import javax.validation.UnexpectedTypeException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +26,19 @@ public class PacienteService {
     @Autowired
     private IEnderecoRepository enderecoRepository;
 
-    public Paciente salvar(Paciente paciente) {
-            return pacienteRepository.save(paciente);
+    @Autowired
+    private PacienteModelMapperConverter pacienteConverter;
+
+    @Autowired
+    private PessoaCustomRepository<Paciente, PacienteModelDTO> pacienteModelCustomRepository;
+
+    public PacienteModelDTO salvar(PacienteModelDTO pacienteDTO) {
+        Paciente paciente = pacienteConverter.mapPacienteModelDTOParaPaciente(pacienteDTO);
+
+        pacienteRepository.save(paciente);
+
+        paciente.setIdade(gerarIdade(Period.between(paciente.getDataNascimento(), LocalDate.now())));
+        return pacienteConverter.mapPacienteParaPacienteModelDTO(paciente);
     }
 
     public Optional<Paciente> buscarPorId(Long id) {
@@ -41,5 +58,11 @@ public class PacienteService {
         }
     }
 
+    public static Idade gerarIdade(Period period) {
+        return Idade.builder()
+                .dias(period.getDays())
+                .meses(period.getMonths())
+                .anos(period.getYears()).build();
+    }
 }
 

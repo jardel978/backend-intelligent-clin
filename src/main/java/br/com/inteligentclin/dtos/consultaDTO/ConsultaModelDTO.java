@@ -1,4 +1,4 @@
-package br.com.inteligentclin.dtos;
+package br.com.inteligentclin.dtos.consultaDTO;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.util.Date;
 @Builder
 @Getter
 @Setter
-public class ConsultaDTO {
+public class ConsultaModelDTO {
 
     private Long id;
     private Long idPaciente;

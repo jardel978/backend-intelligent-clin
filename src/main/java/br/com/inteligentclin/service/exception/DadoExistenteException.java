@@ -1,4 +1,4 @@
-package com.clinicasorridente.pifinalbackend.service.exception;
+package br.com.inteligentclin.service.exception;
 
 import java.io.Serializable;
 

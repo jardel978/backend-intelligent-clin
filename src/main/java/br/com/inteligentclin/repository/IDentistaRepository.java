@@ -1,10 +1,18 @@
-package com.clinicasorridente.pifinalbackend.repository;
+package br.com.inteligentclin.repository;
 
-import com.clinicasorridente.pifinalbackend.entity.Dentista;
+import br.com.inteligentclin.entity.Dentista;
+import br.com.inteligentclin.entity.enums.Especialidade;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface IDentistaRepository extends JpaRepository<Dentista, Long> {
+import java.util.List;
+import java.util.Optional;
 
+public interface IDentistaRepository extends IPessoaBaseRepository<Dentista>, JpaRepository<Dentista, Long> {
 
+    Optional<Dentista> findByMatriculaContains(String matricula);
+
+    Page<Dentista> findByEspecialidadesContains(Pageable pageable, Especialidade especialidade);
 
 }

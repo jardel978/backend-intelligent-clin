@@ -1,6 +1,6 @@
-package com.clinicasorridente.pifinalbackend.repository;
+package br.com.inteligentclin.repository;
 
-import com.clinicasorridente.pifinalbackend.entity.Consulta;
+import br.com.inteligentclin.entity.Consulta;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IConsultaRepository extends JpaRepository<Consulta, Long> {

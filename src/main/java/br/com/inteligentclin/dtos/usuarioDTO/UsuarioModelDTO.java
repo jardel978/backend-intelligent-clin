@@ -1,4 +1,4 @@
-package br.com.inteligentclin.dtos;
+package br.com.inteligentclin.dtos.usuarioDTO;
 
 import br.com.inteligentclin.entity.Consulta;
 import br.com.inteligentclin.entity.enums.Cargo;
@@ -12,7 +12,7 @@ import java.util.Set;
 @Builder
 @Getter
 @Setter
-public class UsuarioDTO implements Serializable {
+public class UsuarioModelDTO implements Serializable {
 
     private Long id;
     private String nome;
