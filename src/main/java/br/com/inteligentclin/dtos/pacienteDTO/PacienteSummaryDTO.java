@@ -4,6 +4,7 @@ import br.com.inteligentclin.dtos.PessoaModelDTO;
 import br.com.inteligentclin.dtos.PessoaSummaryDTO;
 import br.com.inteligentclin.entity.Consulta;
 import br.com.inteligentclin.entity.Endereco;
+import br.com.inteligentclin.entity.Idade;
 import br.com.inteligentclin.entity.Prontuario;
 import br.com.inteligentclin.entity.enums.Sexo;
 import lombok.*;
@@ -22,7 +23,9 @@ public class PacienteSummaryDTO extends PessoaSummaryDTO implements Serializable
 
     private static final long serialVersionUID = 1L;
 
-    private Long idade;
+//    private LocalDate dataNascimento;
+
+    private Idade idade;
 
     private Set<Consulta> consultas;
 

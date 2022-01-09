@@ -1,16 +1,13 @@
 package br.com.inteligentclin.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
 @Repository
-public class PessoaCustomRepository<T, R> {
+public class PessoaCustomRepository<T> {
 
     private final EntityManager entityManager;
 
@@ -19,7 +16,7 @@ public class PessoaCustomRepository<T, R> {
         this.entityManager = entityManager;
     }
 
-    public Page<R> find(Pageable pageable, Long id, String nome, String sobrenome, String cpf, Class<T> clazz) {
+    public List<T> find(Long id, String nome, String sobrenome, String cpf, Class<T> clazz) {
 
         String query = "select T from " + clazz.getName() + " as T ";
         String condicao = "where";
@@ -61,9 +58,7 @@ public class PessoaCustomRepository<T, R> {
             qry.setParameter("cpf", cpf);
         }
 
-        List<R> lista = qry.getResultList();
-
-        return new PageImpl<>(lista, pageable, lista.stream().count());
+        return qry.getResultList();
     }
 
 }

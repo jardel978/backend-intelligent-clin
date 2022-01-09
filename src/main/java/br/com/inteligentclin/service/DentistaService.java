@@ -11,9 +11,11 @@ import br.com.inteligentclin.service.exception.DadoExistenteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,13 +25,13 @@ public class DentistaService {
     private IDentistaRepository dentistaRepository;
 
     @Autowired
-    private PessoaCustomRepository<Dentista, DentistaModelDTO> dentistaModelCustomRepository;
+    private PessoaCustomRepository<Dentista> dentistaModelCustomRepository;
 
     @Autowired
     private DentistaModelMapperConverter dentistaConverter;
 
     public DentistaModelDTO salvar(DentistaModelDTO dentistaDTO) {
-        Dentista dentista = dentistaConverter.mapDentistaModelDTOParaDentista(dentistaDTO);
+        Dentista dentista = dentistaConverter.mapModelDTOToEntity(dentistaDTO, Dentista.class);
         dentistaRepository.save(dentista);
 
         return dentistaDTO;
@@ -40,14 +42,19 @@ public class DentistaService {
                 new DadoExistenteException("Dentista não encontrado.")
         );
 
-        return Optional.ofNullable(dentistaConverter.mapDentistaParaDentistaModelDTO(dentista));
+        return Optional.ofNullable(dentistaConverter.mapEntityToModelDTO(dentista, DentistaModelDTO.class));
     }
 
 
-    public Page<DentistaModelDTO> buscarCustomizado(Pageable pageable, Long id, String nome, String sobrenome,
+    public Page<DentistaModelDTO> buscarCustomizado(Pageable pageable,
+                                                    Long id,
+                                                    String nome,
+                                                    String sobrenome,
                                                     String cpf) {
-        return dentistaModelCustomRepository.find(pageable, id, nome, sobrenome, cpf,
-                Dentista.class);
+
+        List<Dentista> lista = dentistaModelCustomRepository.find(id, nome, sobrenome, cpf, Dentista.class);
+        List<DentistaModelDTO> listaDTO = dentistaConverter.convertListEntityToModelDTO(lista, DentistaModelDTO.class);
+        return new PageImpl<>(listaDTO, pageable, lista.stream().count());
     }
 
     public DentistaModelDTO buscarPorMatricula(String numMatricula) {
@@ -55,17 +62,17 @@ public class DentistaService {
                 new DadoExistenteException("Não localizamos um Dentista com a série de matrícula informada.")
         );
 
-        return dentistaConverter.mapDentistaParaDentistaModelDTO(dentista);
+        return dentistaConverter.mapEntityToModelDTO(dentista, DentistaModelDTO.class);
     }
 
     public Page<DentistaSummaryDTO> buscarPorEspecialidades(Pageable pageable, Especialidade nomeEspecialidade) {
         Page<Dentista> dentistasPage = dentistaRepository.findByEspecialidadesContains(pageable, nomeEspecialidade);
-        return dentistaConverter.convertPageDentistasParaDentistasSummaryDTO(dentistasPage, pageable);
+        return dentistaConverter.convertPageEntityToSummaryDTO(dentistasPage, pageable, DentistaSummaryDTO.class);
     }
 
     public Page<DentistaSummaryDTO> buscarTodos(Pageable pageable) {
         Page<Dentista> dentistasPage = dentistaRepository.findAll(pageable);
-        return dentistaConverter.convertPageDentistasParaDentistasSummaryDTO(dentistasPage, pageable);
+        return dentistaConverter.convertPageEntityToSummaryDTO(dentistasPage, pageable, DentistaSummaryDTO.class);
     }
 
     public void excluirPorId(Long id) {

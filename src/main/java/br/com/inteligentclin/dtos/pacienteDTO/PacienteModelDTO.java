@@ -2,6 +2,7 @@ package br.com.inteligentclin.dtos.pacienteDTO;
 
 import br.com.inteligentclin.dtos.PessoaModelDTO;
 import br.com.inteligentclin.entity.Consulta;
+import br.com.inteligentclin.entity.Endereco;
 import br.com.inteligentclin.entity.Idade;
 import br.com.inteligentclin.entity.Prontuario;
 import br.com.inteligentclin.entity.enums.Sexo;
@@ -9,7 +10,6 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.Set;
 
 @Builder
@@ -24,6 +24,8 @@ public class PacienteModelDTO extends PessoaModelDTO implements Serializable {
     private LocalDate dataNascimento;
 
     private Idade idade;
+
+    private Endereco endereco;
 
     private Set<Consulta> consultas;
 

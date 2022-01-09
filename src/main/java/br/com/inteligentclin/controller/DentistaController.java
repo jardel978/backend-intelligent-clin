@@ -23,7 +23,6 @@ public class DentistaController {
     @Autowired
     private DentistaService dentistaService;
 
-
     @PostMapping
     @Transactional
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,12 +43,11 @@ public class DentistaController {
     //     cpf...)
     @GetMapping("/custom")
     @ResponseStatus(HttpStatus.OK)
-    public Page<DentistaModelDTO> buscarCustomizado(
-            Pageable pageable,
-            @RequestParam(value = "id", required = false) Long id,
-            @RequestParam(value = "nome", required = false) String nome,
-            @RequestParam(value = "sobrenome", required = false) String sobrenome,
-            @RequestParam(value = "cpf", required = false) String cpf) {
+    public Page<DentistaModelDTO> buscarCustomizado(Pageable pageable,
+                                                    @RequestParam(value = "id", required = false) Long id,
+                                                    @RequestParam(value = "nome", required = false) String nome,
+                                                    @RequestParam(value = "sobrenome", required = false) String sobrenome,
+                                                    @RequestParam(value = "cpf", required = false) String cpf) {
         return dentistaService.buscarCustomizado(pageable, id, nome, sobrenome, cpf);
     }
 
@@ -95,7 +93,8 @@ public class DentistaController {
     }
 
     @PutMapping("/{id}")
-    @Transactional//colocar isso em todos os métodos de excluir, salvar e atualizar (esse comentário = última modificação)
+    @Transactional
+//colocar isso em todos os métodos de excluir, salvar e atualizar (esse comentário = última modificação)
     @ResponseStatus(HttpStatus.OK)//mudar para esse httpStatus os outros métodos de delete, save, update
     public void atualizar(
             @PathVariable("id") Long id,
