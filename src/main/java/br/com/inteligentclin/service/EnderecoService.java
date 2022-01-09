@@ -3,6 +3,7 @@ package com.clinicasorridente.pifinalbackend.service;
 import com.clinicasorridente.pifinalbackend.entity.Endereco;
 import com.clinicasorridente.pifinalbackend.repository.IEnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +29,11 @@ public class EnderecoService {
     }
 
     public void excluirPorId(Long id) {
-        enderecoRepository.deleteById(id);
+        try {
+            enderecoRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException("Não é possível excluir um endereço que está vinculado a um " +
+                    "paciente.");
+        }
     }
 }

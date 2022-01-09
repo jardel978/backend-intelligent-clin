@@ -1,4 +1,4 @@
-package com.clinicasorridente.pifinalbackend;
+package br.com.inteligentclin;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

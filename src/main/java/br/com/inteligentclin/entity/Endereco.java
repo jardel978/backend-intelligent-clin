@@ -18,24 +18,26 @@ import java.util.Set;
 @SequenceGenerator(name = "endereco", sequenceName = "SQ_TB_ENDERECO", allocationSize = 1)
 public class Endereco implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "endereco_id")
     @GeneratedValue(generator = "endereco", strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "endereco_rua")
     private String rua;
 
-    @Column(name = "endereco_numero")
     private String numero;
 
-    @Column(name = "endereco_cidade")
+    private String bairro;
+
     private String cidade;
 
-    @Column(name = "endereco_estado")
     private String estado;
 
-    @OneToMany(mappedBy = "endereco", fetch = FetchType.LAZY)
+    private String complemento;
+
+    @OneToMany(mappedBy = "endereco")
     @JsonIgnore
     private Set<Paciente> pacientes = new HashSet<>();
 

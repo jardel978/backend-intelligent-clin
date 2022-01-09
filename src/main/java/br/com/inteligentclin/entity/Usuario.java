@@ -1,53 +1,45 @@
 package com.clinicasorridente.pifinalbackend.entity;
 
+import com.clinicasorridente.pifinalbackend.entity.enums.Cargo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
 @Getter
 @Setter
-@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "TB_USUARIO")
 @SequenceGenerator(name = "usuario", sequenceName = "SQ_TB_USUARIO", allocationSize = 1)
-public class Usuario implements Serializable {
+public class Usuario extends Pessoa implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "usuario_id")
     @GeneratedValue(generator = "usuario", strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "usuario_nome")
-    @NotNull(message = "Informe o nome do usuário a ser cadastrado.")
-    private String nome;
+    @NotNull(message = "É necessário informar um login para o novo usuário.")
+    @Size(min = 8, max = 15, message = "Seu endereço de login deve ter no mínimo 8 dígitos.")
+    private String login;
 
-    @Column(name = "usuario_email")
-    @NotNull(message = "É necessário informar o email do novo usuário para o cadastro.")
-    @Pattern(regexp = "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", message =
-            "Formato de email inválido.")
-    private String email;
-
-    @Column(name = "usuario_senha")
     @Size(min = 6, max = 15, message = "Sua senha deve ter no mínimo 6 dígitos.")
     private String senha;
-
-    @Column(name = "usuario_acesso")
-    @Enumerated(value = EnumType.STRING)
-    private CategoriaUsuario acesso;
 
 //    @JsonManagedReference
     @JsonIgnore
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Set<Consulta> consultas = new HashSet<>();
 
+    @Enumerated(value = EnumType.STRING)
+    private Cargo cargo;
 }

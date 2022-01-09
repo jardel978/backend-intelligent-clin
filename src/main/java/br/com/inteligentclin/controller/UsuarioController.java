@@ -87,7 +87,7 @@ public class UsuarioController {
         usuarioDaBase.setNome(usuario.getNome());
         usuarioDaBase.setEmail(usuario.getEmail());
         usuarioDaBase.setSenha(usuario.getSenha());
-        usuarioDaBase.setAcesso(usuario.getAcesso());
+        usuarioDaBase.setCargo(usuario.getCargo());
         usuarioService.salvar(usuarioDaBase);
     }
 

@@ -26,9 +26,6 @@ public class DentistaController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Autowired
-    EntityManager entityManager;
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Dentista salvar(@Valid @RequestBody Dentista dentista, BindingResult bgresult) {
@@ -65,8 +62,9 @@ public class DentistaController {
     }
 
     @PutMapping("/{id}")
-    @Transactional
-    @ResponseStatus(HttpStatus.OK)
+    @Transactional//colocar isso em todos os métodos de excluir, salvar e atualizar (esse comentário = última
+    // modificação)
+    @ResponseStatus(HttpStatus.OK)//mudar para esse httpStatus os outros métodos de delete, save, update
     public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody Dentista dentista, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());

@@ -1,4 +1,4 @@
-package com.clinicasorridente.pifinalbackend.dtos;
+package br.com.inteligentclin.dtos;
 
 import lombok.Builder;
 import lombok.Getter;

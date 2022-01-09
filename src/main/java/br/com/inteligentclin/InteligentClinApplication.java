@@ -1,4 +1,4 @@
-package com.clinicasorridente.pifinalbackend;
+package br.com.inteligentclin;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
