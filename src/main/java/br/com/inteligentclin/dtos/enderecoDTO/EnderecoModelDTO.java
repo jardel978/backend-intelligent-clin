@@ -1,23 +1,18 @@
 package br.com.inteligentclin.dtos.enderecoDTO;
 
 import br.com.inteligentclin.entity.Paciente;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.Set;
 
-@Builder
 @Getter
 @Setter
-public class EnderecoModelDTO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class EnderecoModelDTO extends EnderecoSummaryDTO implements Serializable {
 
-    private Long id;
-    private String rua;
-    private String numero;
-    private String cidade;
-    private String estado;
+    private String complemento;
     private Set<Paciente> pacientes;
-
 
 }

@@ -6,8 +6,8 @@ import br.com.inteligentclin.entity.Dentista;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@NoArgsConstructor
 @Component
+@NoArgsConstructor
 public class DentistaModelMapperConverter extends GenericModelMapperConverter<Dentista, DentistaModelDTO,
         DentistaSummaryDTO> {
 

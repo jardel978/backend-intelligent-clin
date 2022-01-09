@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
@@ -53,5 +54,8 @@ public class Consulta implements Serializable {
     @ManyToOne
     @JoinColumn(name = "prontuario_id", foreignKey = @ForeignKey(name = "fk_prontuario_consulta"))
     private Prontuario prontuario;
+
+//    @Digits(fraction = 0, integer = 10)
+//    private Double valor;
 
 }

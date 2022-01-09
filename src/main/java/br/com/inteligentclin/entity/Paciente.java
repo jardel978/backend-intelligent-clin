@@ -37,12 +37,12 @@ public class Paciente extends Pessoa implements Serializable {
     @Transient
     private Idade idade;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "endereco_id", foreignKey = @ForeignKey(name = "fk_endereco"))
     private Endereco endereco;
 
 //    @JsonManagedReference
-    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "paciente")
     @JsonIgnore
     private Set<Consulta> consultas = new HashSet<>();
 
