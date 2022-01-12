@@ -1,5 +1,6 @@
 package br.com.inteligentclin.entity;
 
+import br.com.inteligentclin.entity.enums.Especialidade;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "TB_ENDERECO")
@@ -27,7 +29,6 @@ public class Endereco implements Serializable {
 
     private String rua;
 
-    @Column(unique = true)
     private String numero;
 
     private String bairro;

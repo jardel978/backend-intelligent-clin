@@ -1,15 +1,22 @@
 package br.com.inteligentclin.controller;
 
+import br.com.inteligentclin.controller.exception.ConstraintException;
 import br.com.inteligentclin.dtos.enderecoDTO.EnderecoModelDTO;
+import br.com.inteligentclin.dtos.enderecoDTO.EnderecoSummaryDTO;
 import br.com.inteligentclin.entity.Endereco;
 import br.com.inteligentclin.service.EnderecoService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -19,12 +26,12 @@ public class EnderecoController {
     @Autowired
     private EnderecoService enderecoService;
 
-    @PostMapping
-    @Transactional
-    @ResponseStatus(HttpStatus.CREATED)
-    public Endereco salvar(@RequestBody Endereco endereco) {
-        return enderecoService.salvar(endereco);
-    }
+//    @PostMapping
+//    @Transactional
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public EnderecoModelDTO salvar(@Valid @RequestBody EnderecoModelDTO enderecoDTO) {
+//        return enderecoService.salvar(enderecoDTO);
+//    }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -34,44 +41,35 @@ public class EnderecoController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Endereco> buscarTodos() {
-        return enderecoService.buscarTodos();
+    public Page<EnderecoSummaryDTO> buscarTodos(Pageable pageable) {
+        return enderecoService.buscarTodos(pageable);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluirPorId(@PathVariable("id") Long id) {
-        enderecoService.buscarPorId(id)
-                .map(endereco -> {
-                    enderecoService.excluirPorId(endereco.getId());
-                    return Void.TYPE;
-                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Endereço não encontrado")
-                );
+        try {
+            enderecoService.buscarPorId(id)
+                    .map(endereco -> {
+                        enderecoService.excluirPorId(endereco.getId());
+                        return Void.TYPE;
+                    }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Endereço não encontrado")
+                    );
+        } catch (
+                DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException("Não é possível excluir um endereço que está vinculado a um " +
+                    "paciente.");
+        }
     }
 
-//    @PutMapping("/{id}")
-//    @Transactional
-//    public void atualizar(@PathVariable("id") Long id, @RequestBody Endereco endereco) {
-////        enderecoService.buscarPorId(id)
-////                .map(enderecoDaBase -> {
-////                    modelMapper.map(endereco, enderecoDaBase);
-////                    enderecoService.salvar(enderecoDaBase);
-////                    return Void.TYPE;
-////                }).orElseThrow(() ->
-////                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado.")
-////                );
-//        Endereco enderecoDaBase = enderecoService.buscarPorId(id).orElseThrow(() ->
-//                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado.")
-//                );
-//        enderecoDaBase.setRua(endereco.getRua());
-//        enderecoDaBase.setNumero(endereco.getNumero());
-//        enderecoDaBase.setCidade(endereco.getCidade());
-//        enderecoDaBase.setEstado(endereco.getEstado());
-////        enderecoDaBase.setPacientes(endereco.getPacientes());
-//        enderecoService.salvar(enderecoDaBase);
-//    }
-//
+    @PutMapping("/{id}")
+    @Transactional
+    @ResponseStatus(HttpStatus.OK)
+    public void atualizar(@PathVariable("id") Long id, @RequestBody EnderecoModelDTO enderecoDTO) {
+        enderecoService.atualizar(id, enderecoDTO);
+    }
+
 }
 

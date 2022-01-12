@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 @RestController()
@@ -22,6 +23,7 @@ public class PacienteController {
     private PacienteService pacienteService;
 
     @PostMapping
+    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public PacienteModelDTO salvar(@Valid @RequestBody PacienteModelDTO pacienteDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
@@ -53,18 +55,14 @@ public class PacienteController {
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluirPorId(@PathVariable("id") Long id) {
-        pacienteService.buscarPorId(id)
-                .map(paciente -> {
-                    pacienteService.excluirPorId(paciente.getId());
-                    return Void.TYPE;
-                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Paciente não encontrado")
-                );
+        pacienteService.excluirPorId(id);
     }
 
     @PutMapping("/{id}")
+    @Transactional
     @ResponseStatus(HttpStatus.OK)
     public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody PacienteModelDTO pacienteDTO,
                           BindingResult bgresult) {

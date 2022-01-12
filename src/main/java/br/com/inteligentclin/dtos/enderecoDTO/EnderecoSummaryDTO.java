@@ -18,6 +18,7 @@ public class EnderecoSummaryDTO implements Serializable {
     private Long id;
     private String rua;
     private String numero;
+    private String bairro;
 
     @Digits(fraction = 0, integer = 8, message = "CEP inválido. Certifique-se de ter informado apenas 8 caracteres " +
             "numéricos.")

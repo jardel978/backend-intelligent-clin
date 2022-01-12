@@ -37,7 +37,7 @@ public class Paciente extends Pessoa implements Serializable {
     @Transient
     private Idade idade;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne//(cascade = CascadeType.ALL)
     @JoinColumn(name = "endereco_id", foreignKey = @ForeignKey(name = "fk_endereco"))
     private Endereco endereco;
 

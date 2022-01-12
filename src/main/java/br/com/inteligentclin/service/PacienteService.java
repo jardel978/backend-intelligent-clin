@@ -3,12 +3,13 @@ package br.com.inteligentclin.service;
 import br.com.inteligentclin.dtos.converters.PacienteModelMapperConverter;
 import br.com.inteligentclin.dtos.pacienteDTO.PacienteModelDTO;
 import br.com.inteligentclin.dtos.pacienteDTO.PacienteSummaryDTO;
-import br.com.inteligentclin.entity.Idade;
+import br.com.inteligentclin.entity.Endereco;
 import br.com.inteligentclin.entity.Paciente;
 import br.com.inteligentclin.repository.IEnderecoRepository;
 import br.com.inteligentclin.repository.IPacienteRepository;
 import br.com.inteligentclin.repository.PessoaCustomRepository;
 import br.com.inteligentclin.service.exception.DadoExistenteException;
+import br.com.inteligentclin.service.utils.UtilDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,12 +39,20 @@ public class PacienteService {
     @Autowired
     private PessoaCustomRepository<Paciente> pacienteModelCustomRepository;
 
+    @Autowired
+    private UtilDate utilDate;
+
     public PacienteModelDTO salvar(PacienteModelDTO pacienteDTO) {
         Paciente paciente = pacienteConverter.mapModelDTOToEntity(pacienteDTO, Paciente.class);
 
+        Endereco enderecoExite = verificarEnderecoExistente(pacienteDTO.getEndereco());
+        if (enderecoExite != null)
+            paciente.setEndereco(enderecoExite);
+
+        enderecoRepository.save(paciente.getEndereco());
         pacienteRepository.save(paciente);
 
-        paciente.setIdade(gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
+        paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
         return pacienteConverter.mapEntityToModelDTO(paciente, PacienteModelDTO.class);
     }
 
@@ -54,7 +62,7 @@ public class PacienteService {
         Optional<PacienteModelDTO> pacienteDTO = Optional.ofNullable(pacienteConverter.mapEntityToModelDTO(paciente,
                 PacienteModelDTO.class));
 
-        pacienteDTO.get().setIdade(gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
+        pacienteDTO.get().setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
 
         return pacienteDTO;
     }
@@ -69,7 +77,7 @@ public class PacienteService {
         List<PacienteModelDTO> listaDTO = new ArrayList<>();
 
         lista.stream().forEach(paciente -> {
-            paciente.setIdade(gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
+            paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
             PacienteModelDTO pacienteModelDTO = pacienteConverter.mapEntityToModelDTO(paciente,
                     PacienteModelDTO.class);
             listaDTO.add(pacienteModelDTO);
@@ -83,7 +91,7 @@ public class PacienteService {
         List<PacienteSummaryDTO> listaSummaryDTO = new ArrayList<>();
 
         lista.stream().forEach(paciente -> {
-            paciente.setIdade(gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
+            paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
             PacienteSummaryDTO pacienteSummaryDTO = pacienteConverter.mapEntityToSummaryDTO(paciente,
                     PacienteSummaryDTO.class);
             listaSummaryDTO.add(pacienteSummaryDTO);
@@ -94,7 +102,22 @@ public class PacienteService {
 
     public void excluirPorId(Long id) {
         try {
-            pacienteRepository.deleteById(id);
+            buscarPorId(id)
+                    .map(paciente -> {
+//                        verificar se o endereço existe,
+                        Endereco enderecoExite = verificarEnderecoExistente(paciente.getEndereco());
+//                        se ele não tem associação com mais de um paciente e só assim excluí-lo
+                        if (enderecoExite != null) {
+                            if (enderecoExite.getPacientes().size() == 1)
+                                enderecoRepository.delete(enderecoExite);
+                        }
+
+                        pacienteRepository.deleteById(paciente.getId());
+                        return Void.TYPE;
+                    }).orElseThrow(() -> new DadoExistenteException(
+                            "Paciente não encontrado")
+                    );
+
         } catch (DataIntegrityViolationException e) {
             throw new DataIntegrityViolationException("Não é possível excluir um paciente que está vinculado a uma " +
                     "consulta.");
@@ -121,14 +144,15 @@ public class PacienteService {
         salvar(pacienteDaBase);
     }
 
-    public static Idade gerarIdade(LocalDate dataInicial, LocalDate dataFinal) {
-
-        Period period = Period.between(dataInicial, dataFinal);
-
-        return Idade.builder()
-                .dias(period.getDays())
-                .meses(period.getMonths())
-                .anos(period.getYears()).build();
+    public Endereco verificarEnderecoExistente(Endereco endereco) {
+        Endereco enderecoBase = enderecoRepository.findByRuaAndNumeroAndBairro(
+                endereco.getRua(),
+                endereco.getNumero(),
+                endereco.getBairro()
+        );
+        if (enderecoBase != null)
+            return enderecoBase;
+        else
+            return null;
     }
 }
-
