@@ -1,8 +1,8 @@
 package br.com.inteligentclin.service;
 
+import br.com.inteligentclin.dtos.converters.DentistaModelMapperConverter;
 import br.com.inteligentclin.dtos.dentistaDTO.DentistaModelDTO;
 import br.com.inteligentclin.dtos.dentistaDTO.DentistaSummaryDTO;
-import br.com.inteligentclin.dtos.converters.DentistaModelMapperConverter;
 import br.com.inteligentclin.entity.Dentista;
 import br.com.inteligentclin.entity.enums.Especialidade;
 import br.com.inteligentclin.repository.IDentistaRepository;
@@ -51,10 +51,10 @@ public class DentistaService {
                                                     String nome,
                                                     String sobrenome,
                                                     String cpf) {
-
         List<Dentista> lista = dentistaModelCustomRepository.find(id, nome, sobrenome, cpf, Dentista.class);
-        List<DentistaModelDTO> listaDTO = dentistaConverter.convertListEntityToModelDTO(lista, DentistaModelDTO.class);
-        return new PageImpl<>(listaDTO, pageable, lista.stream().count());
+        Page<Dentista> pageDentistas = new PageImpl<>(lista, pageable, lista.stream().count());
+
+        return pageDentistas.map(dentista -> dentistaConverter.mapEntityToModelDTO(dentista, DentistaModelDTO.class));
     }
 
     public DentistaModelDTO buscarPorMatricula(String numMatricula) {
@@ -67,12 +67,12 @@ public class DentistaService {
 
     public Page<DentistaSummaryDTO> buscarPorEspecialidades(Pageable pageable, Especialidade nomeEspecialidade) {
         Page<Dentista> dentistasPage = dentistaRepository.findByEspecialidadesContains(pageable, nomeEspecialidade);
-        return dentistaConverter.convertPageEntityToSummaryDTO(dentistasPage, pageable, DentistaSummaryDTO.class);
+        return dentistasPage.map(dentista -> dentistaConverter.mapEntityToSummaryDTO(dentista, DentistaSummaryDTO.class));
     }
 
     public Page<DentistaSummaryDTO> buscarTodos(Pageable pageable) {
         Page<Dentista> dentistasPage = dentistaRepository.findAll(pageable);
-        return dentistaConverter.convertPageEntityToSummaryDTO(dentistasPage, pageable, DentistaSummaryDTO.class);
+        return dentistasPage.map(dentista -> dentistaConverter.mapEntityToSummaryDTO(dentista, DentistaSummaryDTO.class));
     }
 
     public void excluirPorId(Long id) {

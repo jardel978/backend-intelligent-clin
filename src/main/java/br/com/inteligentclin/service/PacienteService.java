@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,13 +56,12 @@ public class PacienteService {
     }
 
     public Optional<PacienteModelDTO> buscarPorId(Long id) {
-        Paciente paciente = pacienteRepository.findById(id).orElseThrow(() -> new DadoExistenteException("Paciente não encontrado"));
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new DadoExistenteException("Paciente não encontrado"));
 
         Optional<PacienteModelDTO> pacienteDTO = Optional.ofNullable(pacienteConverter.mapEntityToModelDTO(paciente,
                 PacienteModelDTO.class));
-
         pacienteDTO.get().setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
-
         return pacienteDTO;
     }
 
@@ -73,31 +71,21 @@ public class PacienteService {
                                                     String sobrenome,
                                                     String cpf) {
         List<Paciente> lista = pacienteModelCustomRepository.find(id, nome, sobrenome, cpf, Paciente.class);
+        Page<Paciente> pagePacientes = new PageImpl<>(lista, pageable, lista.stream().count());
 
-        List<PacienteModelDTO> listaDTO = new ArrayList<>();
-
-        lista.stream().forEach(paciente -> {
+        return pagePacientes.map(paciente -> {
             paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
-            PacienteModelDTO pacienteModelDTO = pacienteConverter.mapEntityToModelDTO(paciente,
-                    PacienteModelDTO.class);
-            listaDTO.add(pacienteModelDTO);
+            return pacienteConverter.mapEntityToModelDTO(paciente, PacienteModelDTO.class);
         });
-
-        return new PageImpl<>(listaDTO, pageable, listaDTO.stream().count());
     }
 
     public Page<PacienteSummaryDTO> buscarTodos(Pageable pageable) {
-        List<Paciente> lista = pacienteRepository.findAll();
-        List<PacienteSummaryDTO> listaSummaryDTO = new ArrayList<>();
+        Page<Paciente> lista = pacienteRepository.findAll(pageable);
 
-        lista.stream().forEach(paciente -> {
+        return lista.map(paciente -> {
             paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
-            PacienteSummaryDTO pacienteSummaryDTO = pacienteConverter.mapEntityToSummaryDTO(paciente,
-                    PacienteSummaryDTO.class);
-            listaSummaryDTO.add(pacienteSummaryDTO);
+            return pacienteConverter.mapEntityToSummaryDTO(paciente, PacienteSummaryDTO.class);
         });
-
-        return new PageImpl<>(listaSummaryDTO, pageable, listaSummaryDTO.stream().count());
     }
 
     public void excluirPorId(Long id) {

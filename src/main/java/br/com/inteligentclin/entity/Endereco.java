@@ -13,7 +13,6 @@ import java.util.Set;
 @Setter
 @Entity
 @Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "TB_ENDERECO")

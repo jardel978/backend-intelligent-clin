@@ -1,5 +1,8 @@
 package br.com.inteligentclin.dtos.consultaDTO;
 
+import br.com.inteligentclin.entity.Dentista;
+import br.com.inteligentclin.entity.Paciente;
+import br.com.inteligentclin.entity.Usuario;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,9 +15,9 @@ import java.util.Date;
 public class ConsultaModelDTO {
 
     private Long id;
-    private Long idPaciente;
-    private Long idDentista;
-    private Long idUsuario;
+    private Paciente paciente;
+    private Dentista dentista;
+    private Usuario usuario;
     private Date dataConsulta;
     private String horaConsulta;
 

@@ -33,7 +33,6 @@ public class EnderecoService {
     public EnderecoModelDTO salvar(EnderecoModelDTO enderecoDTO) {
         Endereco endereco = enderecoConverter.mapModelDTOToEntity(enderecoDTO, Endereco.class);
         enderecoRepository.save(endereco);
-
         return enderecoDTO;
     }
 
@@ -44,7 +43,6 @@ public class EnderecoService {
         endereco.getPacientes().stream().forEach(paciente -> {
             paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
         });
-
         return Optional.ofNullable(enderecoConverter.mapEntityToModelDTO(endereco, EnderecoModelDTO.class));
     }
 
@@ -59,8 +57,8 @@ public class EnderecoService {
                 });
 
         Page<Endereco> enderecosPage = enderecoRepository.findAll(pageable);
-
-        return enderecoConverter.convertPageEntityToSummaryDTO(enderecosPage, pageable, EnderecoSummaryDTO.class);
+        return enderecosPage.map(endereco -> enderecoConverter.mapEntityToSummaryDTO(endereco,
+                EnderecoSummaryDTO.class));
     }
 
     public void excluirPorId(Long id) {
@@ -73,13 +71,9 @@ public class EnderecoService {
     }
 
     public void atualizar(Long id, EnderecoModelDTO enderecoDTO) {
-
         EnderecoModelDTO enderecoDaBase = buscarPorId(id).orElseThrow(() -> new DadoExistenteException(
                 "Endereço não encontrado")
         );
-
-        System.out.println(enderecoDaBase);
-
         enderecoDaBase.setRua(enderecoDTO.getRua());
         enderecoDaBase.setNumero(enderecoDTO.getNumero());
         enderecoDaBase.setBairro(enderecoDTO.getBairro());
@@ -88,7 +82,6 @@ public class EnderecoService {
         enderecoDaBase.setEstado(enderecoDTO.getEstado());
         enderecoDaBase.setComplemento(enderecoDTO.getComplemento());
         enderecoDaBase.setPacientes(enderecoDTO.getPacientes());
-
         salvar(enderecoDaBase);
     }
 }

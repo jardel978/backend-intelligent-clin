@@ -36,34 +36,34 @@ public class GenericModelMapperConverter<E, M, S> {
         return modelMapper.map(entity, summaryClassDestination);
     }
 
-    public List<M> convertListEntityToModelDTO(List<E> listEntity, Class<M> modelClassDestination) {
+//    public List<M> convertListEntityToModelDTO(List<E> listEntity, Class<M> modelClassDestination) {
+//
+//        List<M> listSummaryDTO = new ArrayList<>();
+//
+//        listEntity.stream().forEach(entity -> {
+//            M modelDTO = mapEntityToModelDTO(entity, modelClassDestination);
+//            listSummaryDTO.add(modelDTO);
+//        });
+//        return listSummaryDTO;
+//    }
 
-        List<M> listSummaryDTO = new ArrayList<>();
-
-        listEntity.stream().forEach(entity -> {
-            M modelDTO = mapEntityToModelDTO(entity, modelClassDestination);
-            listSummaryDTO.add(modelDTO);
-        });
-        return listSummaryDTO;
-    }
-
-    public List<S> convertListEntityToSummaryDTO(List<E> listEntity, Class<S> summaryClassDestination) {
-
-        List<S> listSummaryDTO = new ArrayList<>();
-
-        listEntity.stream().forEach(entity -> {
-            S summaryDTO = mapEntityToSummaryDTO(entity, summaryClassDestination);
-            listSummaryDTO.add(summaryDTO);
-        });
-        return listSummaryDTO;
-    }
+//    public List<S> convertListEntityToSummaryDTO(List<E> listEntity, Class<S> summaryClassDestination) {
+//
+//        List<S> listSummaryDTO = new ArrayList<>();
+//
+//        listEntity.stream().forEach(entity -> {
+//            S summaryDTO = mapEntityToSummaryDTO(entity, summaryClassDestination);
+//            listSummaryDTO.add(summaryDTO);
+//        });
+//        return listSummaryDTO;
+//    }
 
 
-    public Page<S> convertPageEntityToSummaryDTO(Page<E> entityPage, Pageable pageable, Class<S> summaryClassDestination) {
-        List<S> listSummaryDTO =
-                convertListEntityToSummaryDTO(entityPage.getContent(), summaryClassDestination);
-
-        return new PageImpl<>(listSummaryDTO, pageable, entityPage.getTotalElements());
-    }
+//    public Page<S> convertPageEntityToSummaryDTO(Page<E> entityPage, Pageable pageable, Class<S> summaryClassDestination) {
+//        List<S> listSummaryDTO =
+//                convertListEntityToSummaryDTO(entityPage.getContent(), summaryClassDestination);
+//
+//        return new PageImpl<>(listSummaryDTO, pageable, entityPage.getTotalElements());
+//    }
 
 }
