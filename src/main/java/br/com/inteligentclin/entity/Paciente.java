@@ -45,7 +45,7 @@ public class Paciente extends Pessoa implements Serializable {
     @LazyCollection(LazyCollectionOption.FALSE)
     private Set<Consulta> consultas = new HashSet<>();
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "prontuario_id", foreignKey = @ForeignKey(name = "fk_prontuario_paciente"))
     private Prontuario prontuario;
 

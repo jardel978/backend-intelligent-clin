@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,7 +15,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Table(name = "TB_FILE")
 @SequenceGenerator(name = "file", sequenceName = "SQ_TB_FILE", allocationSize = 1)
-public class File {
+public class File implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "file_id")
