@@ -1,16 +1,14 @@
 package br.com.inteligentclin.entity;
 
 import br.com.inteligentclin.entity.enums.Sexo;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.Period;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,9 +39,10 @@ public class Paciente extends Pessoa implements Serializable {
     @JoinColumn(name = "endereco_id", foreignKey = @ForeignKey(name = "fk_endereco"))
     private Endereco endereco;
 
-//    @JsonManagedReference
+    //    @JsonManagedReference
     @OneToMany(mappedBy = "paciente")
     @JsonIgnore
+    @LazyCollection(LazyCollectionOption.FALSE)
     private Set<Consulta> consultas = new HashSet<>();
 
     @OneToOne

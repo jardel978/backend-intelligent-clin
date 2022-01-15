@@ -1,6 +1,7 @@
 package br.com.inteligentclin.dtos.enderecoDTO;
 
 import br.com.inteligentclin.dtos.pacienteDTO.PacienteSummaryDTO;
+import br.com.inteligentclin.entity.Paciente;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,5 +20,6 @@ public class EnderecoModelDTO extends EnderecoSummaryDTO implements Serializable
 
     private String complemento;
     private Set<PacienteSummaryDTO> pacientes;
+//    private Set<Paciente> pacientes;
 
 }

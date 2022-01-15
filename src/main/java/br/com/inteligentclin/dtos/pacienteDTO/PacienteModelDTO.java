@@ -1,7 +1,6 @@
 package br.com.inteligentclin.dtos.pacienteDTO;
 
 import br.com.inteligentclin.dtos.PessoaModelDTO;
-import br.com.inteligentclin.dtos.enderecoDTO.EnderecoModelDTO;
 import br.com.inteligentclin.entity.Consulta;
 import br.com.inteligentclin.entity.Endereco;
 import br.com.inteligentclin.entity.Idade;

@@ -1,11 +1,11 @@
 package br.com.inteligentclin.entity;
 
 import br.com.inteligentclin.entity.enums.Especialidade;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
@@ -31,19 +31,21 @@ public class Dentista extends Pessoa implements Serializable {
     @Column(unique = true)
     private String matricula;
 
-//    @JsonManagedReference
+    //    @JsonManagedReference
 //    @JsonIgnore
     @OneToMany(mappedBy = "dentista")
+    @LazyCollection (LazyCollectionOption.FALSE)
     private Set<Consulta> consultas = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.LAZY, targetClass = Especialidade.class)
     @Column(name = "dentista_especialidades")
     @JoinTable(name = "dentista_especialidades")
     @Enumerated(value = EnumType.STRING)
+    @LazyCollection (LazyCollectionOption.FALSE)
     private List<Especialidade> especialidades;
-//    private Especialidade especialidades;
 
-//    @JsonIgnore
+    //    @JsonIgnore
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "dentista")
     private Set<Prontuario> prontuarios = new HashSet<>();
 

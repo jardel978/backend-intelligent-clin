@@ -25,7 +25,6 @@ public class DentistaModelDTO extends PessoaModelDTO implements Serializable {
 
     private List<Especialidade> especialidades;
 
-//    @JsonIgnore
     private Set<Consulta> consultas;
 
     private Set<Prontuario> prontuarios;

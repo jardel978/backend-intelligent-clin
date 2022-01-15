@@ -1,8 +1,9 @@
 package br.com.inteligentclin.entity;
 
-import br.com.inteligentclin.entity.enums.Especialidade;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "TB_ENDERECO")
@@ -42,6 +44,7 @@ public class Endereco implements Serializable {
 
     @OneToMany(mappedBy = "endereco")
     @JsonIgnore
+    @LazyCollection(LazyCollectionOption.FALSE)
     private Set<Paciente> pacientes = new HashSet<>();
 
 }

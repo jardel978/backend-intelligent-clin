@@ -8,6 +8,8 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Getter
@@ -28,32 +30,26 @@ public class Consulta implements Serializable {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @NotNull(message = "Por gentileza, informe o paciente para essa consulta.")
     @JoinColumn(name = "paciente_id", foreignKey = @ForeignKey(name = "fk_paciente"))
     private Paciente paciente;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @NotNull(message = "É necessário informar qual o dentista fará o atendimento.")
     @JoinColumn(name = "dentista_id", foreignKey = @ForeignKey(name = "fk_dentista"))
     private Dentista dentista;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @NotNull(message = "Não é possível registrar uma consulta sem informar o usuário que a está registrando.")
     @JoinColumn(name = "usuario_id", foreignKey = @ForeignKey(name = "fk_usuario"))
     private Usuario usuario;
 
-    @NotNull(message = "Informe a data da consulta.")
-    @Temporal(TemporalType.DATE)
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    private Date dataConsulta;
+//    @JsonFormat(pattern = "dd-MM-yyyy")
+    private LocalDate dataConsulta;
 
-    @NotNull(message = "Informe o horário da consulta.")
-    @Pattern(regexp="\\d{2}\\:\\d{2}", message = "Informe uma data no formato HH:mm")
-    private String horaConsulta;
+//    @Pattern(regexp="\\d{2}\\:\\d{2}", message = "Informe uma data no formato HH:mm")
+    private LocalTime horaConsulta;
 
-    @ManyToOne
-    @JoinColumn(name = "prontuario_id", foreignKey = @ForeignKey(name = "fk_prontuario_consulta"))
-    private Prontuario prontuario;
+//    @ManyToOne
+//    @JoinColumn(name = "prontuario_id", foreignKey = @ForeignKey(name = "fk_prontuario_consulta"))
+//    private Prontuario prontuario;
 
 //    @Digits(fraction = 0, integer = 10)
 //    private Double valor;

@@ -2,6 +2,8 @@ package br.com.inteligentclin.controller;
 
 import br.com.inteligentclin.controller.exception.ConstraintException;
 import br.com.inteligentclin.dtos.consultaDTO.ConsultaModelDTO;
+import br.com.inteligentclin.dtos.consultaDTO.ConsultaSummaryDTO;
+import br.com.inteligentclin.dtos.converters.ConsultaModelMapperConverter;
 import br.com.inteligentclin.entity.Consulta;
 import br.com.inteligentclin.service.ConsultaService;
 import org.modelmapper.ModelMapper;
@@ -23,17 +25,17 @@ public class ConsultaController {
     private ConsultaService consultaService;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private ConsultaModelMapperConverter consultaConverter;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ConsultaModelDTO salvar(@Valid @RequestBody Consulta consulta, BindingResult bgresult) {
+    public Consulta salvar(@Valid @RequestBody Consulta consulta, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
-        consultaService.salvar(consulta);
-        ConsultaModelDTO consultaModelDTO = converterDTO(consulta);
-        return consultaModelDTO;
+        return consultaService.salvar(consulta);
+//        ConsultaModelDTO consultaModelDTO = consultaConverter.co(consulta);
+//        return consultaModelDTO;
     }
 
     @GetMapping("/{id}")
@@ -46,9 +48,11 @@ public class ConsultaController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ConsultaModelDTO> buscarTodos() {
+    public List<ConsultaSummaryDTO> buscarTodos() {
         List<Consulta> lista = consultaService.buscarTodos();
-        List<ConsultaModelDTO> listaDTO = lista.stream().map(consulta -> converterDTO(consulta)).collect(Collectors.toList());
+        List<ConsultaSummaryDTO> listaDTO =
+                lista.stream().map(consulta ->
+                        consultaConverter.converterCosultaToSummaryDTO(consulta)).collect(Collectors.toList());
         return listaDTO;
     }
 
@@ -87,15 +91,4 @@ public class ConsultaController {
         consultaDaBase.setHoraConsulta(consulta.getHoraConsulta());
         consultaService.salvar(consultaDaBase);
     }
-
-    private ConsultaModelDTO converterDTO(Consulta consulta) {
-        return ConsultaModelDTO.builder()
-                .id(consulta.getId())
-                .idPaciente(consulta.getPaciente().getId())
-                .idDentista(consulta.getDentista().getId())
-                .idUsuario(consulta.getUsuario().getId())
-                .dataConsulta(consulta.getDataConsulta())
-                .horaConsulta(consulta.getHoraConsulta()).build();
-    }
-
 }
