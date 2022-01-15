@@ -1,5 +1,6 @@
 package br.com.inteligentclin.entity;
 
+import br.com.inteligentclin.entity.enums.StatusConsulta;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -47,11 +48,11 @@ public class Consulta implements Serializable {
 //    @Pattern(regexp="\\d{2}\\:\\d{2}", message = "Informe uma data no formato HH:mm")
     private LocalTime horaConsulta;
 
-//    @ManyToOne
-//    @JoinColumn(name = "prontuario_id", foreignKey = @ForeignKey(name = "fk_prontuario_consulta"))
-//    private Prontuario prontuario;
+    private String complemento;
 
-//    @Digits(fraction = 0, integer = 10)
-//    private Double valor;
+    private Double valor;
+
+    @Enumerated(EnumType.STRING)
+    private StatusConsulta status;
 
 }

@@ -43,7 +43,4 @@ public class Prontuario implements Serializable {
 
     private byte odontograma;
 
-    @OneToMany(mappedBy = "prontuario")
-    @JsonIgnore
-    private Set<Consulta> consultas = new HashSet<>();
 }
