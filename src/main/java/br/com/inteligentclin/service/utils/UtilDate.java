@@ -24,4 +24,9 @@ public class UtilDate implements Serializable {
                 .anos(period.getYears()).build();
     }
 
+    public boolean verificarValidadeProntuario(LocalDate dataCriacao) {
+        Period period = Period.between(dataCriacao, LocalDate.now());
+        return period.getYears() >= 10;
+    }
+
 }
