@@ -2,6 +2,7 @@ package br.com.inteligentclin.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -29,7 +30,7 @@ public class Prontuario implements Serializable {
     @JoinColumn(name = "paciente_id", foreignKey = @ForeignKey(name = "fk_paciente_prontuario"))
     private Paciente paciente;
 
-    private byte radiografias;
+//    private byte radiografias;
 
     @ManyToOne
     @JoinColumn(name = "dentista_id", foreignKey = @ForeignKey(name = "fk_dentista_prontuario"))
@@ -41,6 +42,8 @@ public class Prontuario implements Serializable {
     @Column(name = "evolucao_tratamento")
     private String evolucaoTratamento;
 
-    private byte odontograma;
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "file_id", foreignKey = @ForeignKey(name = "fk_file_prontuario"))
+    private File file;
 
 }
