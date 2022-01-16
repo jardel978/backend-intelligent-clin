@@ -1,5 +1,8 @@
 package br.com.inteligentclin.dtos.prontuarioDTO;
 
+import br.com.inteligentclin.dtos.dentistaDTO.DentistaSummaryDTO;
+import br.com.inteligentclin.dtos.pacienteDTO.PacienteMixDTO;
+import br.com.inteligentclin.dtos.pacienteDTO.PacienteSummaryDTO;
 import br.com.inteligentclin.entity.Dentista;
 import br.com.inteligentclin.entity.Paciente;
 import lombok.AllArgsConstructor;
@@ -21,9 +24,9 @@ public class ProntuarioSummaryDTO implements Serializable {
     private Long id;
 
     @NotNull(message = "Por gentileza, informe a qual paciente pertence esse prontuário.")
-    private Paciente paciente;
+    private PacienteMixDTO paciente;
 
     @NotNull(message = "É necessário informar qual o dentista responsável pelo paciente dono desse prontuário.")
-    private Dentista dentista;
+    private DentistaSummaryDTO dentista;
 
 }

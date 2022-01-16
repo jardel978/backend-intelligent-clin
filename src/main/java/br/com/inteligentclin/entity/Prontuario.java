@@ -1,5 +1,6 @@
 package br.com.inteligentclin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,6 +24,7 @@ public class Prontuario implements Serializable {
     @GeneratedValue(generator = "prontuario", strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "paciente_id", foreignKey = @ForeignKey(name = "fk_paciente_prontuario"))
     private Paciente paciente;

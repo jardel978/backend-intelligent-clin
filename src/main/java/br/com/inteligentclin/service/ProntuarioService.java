@@ -45,6 +45,8 @@ public class ProntuarioService {
                 "Paciente não encontrado."
         ));
 
+        paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
+
         Dentista dentista = dentistaRepository.findById(idDentista).orElseThrow(() -> new DadoExistenteException(
                 "Dentista não encontrado."));
 
@@ -73,13 +75,18 @@ public class ProntuarioService {
                 "Prontuário não encontrado."
         ));
 
+        Paciente paciente = prontuario.getPaciente();
+        paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
         return Optional.ofNullable(prontuarioConverter.mapEntityToModelDTO(prontuario, ProntuarioModelDTO.class));
     }
 
     public Page<ProntuarioSummaryDTO> buscarTodos(Pageable pageable) {
         Page<Prontuario> pageProntuarios = prontuarioRepository.findAll(pageable);
-        return pageProntuarios.map(prontuario ->
-                prontuarioConverter.mapEntityToSummaryDTO(prontuario, ProntuarioSummaryDTO.class));
+        return pageProntuarios.map(prontuario -> {
+            Paciente paciente = prontuario.getPaciente();
+            paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
+            return prontuarioConverter.mapEntityToSummaryDTO(prontuario, ProntuarioSummaryDTO.class);
+        });
     }
 
     public void excluirPorId(Long id) throws ValidadeProntuarioException {
