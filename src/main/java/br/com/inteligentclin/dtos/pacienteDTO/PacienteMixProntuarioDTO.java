@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PacienteMixDTO extends PessoaSummaryDTO implements Serializable {
+public class PacienteMixProntuarioDTO extends PessoaSummaryDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

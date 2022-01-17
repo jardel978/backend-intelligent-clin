@@ -6,6 +6,7 @@ import br.com.inteligentclin.entity.Endereco;
 import br.com.inteligentclin.entity.Idade;
 import br.com.inteligentclin.entity.Prontuario;
 import br.com.inteligentclin.entity.enums.Sexo;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.io.Serializable;
@@ -21,6 +22,7 @@ public class PacienteModelDTO extends PessoaModelDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate dataNascimento;
 
     private Idade idade;
