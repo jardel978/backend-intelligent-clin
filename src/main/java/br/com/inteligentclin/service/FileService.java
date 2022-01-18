@@ -4,7 +4,7 @@ import br.com.inteligentclin.entity.File;
 import br.com.inteligentclin.entity.Prontuario;
 import br.com.inteligentclin.repository.IFileRepository;
 import br.com.inteligentclin.repository.IProntuarioRepository;
-import br.com.inteligentclin.service.exception.DadoExistenteException;
+import br.com.inteligentclin.service.exception.DadoInexistenteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +36,7 @@ public class FileService {
     }
 
     public File atualizar(Long id, MultipartFile file) throws IOException {
-        File arquivoDaBase = fileRepository.findById(id).orElseThrow(() -> new DadoExistenteException(
+        File arquivoDaBase = fileRepository.findById(id).orElseThrow(() -> new DadoInexistenteException(
                 "Arquivo não encontrado."));
         try {
             arquivoDaBase.setNome(file.getOriginalFilename());
@@ -56,7 +56,7 @@ public class FileService {
         validarNomeArquivo(nomeArquivo);
 
         Prontuario prontuario = prontuarioRepository.findById(idProntuario).orElseThrow(() ->
-                new DadoExistenteException("Prontuário não encontrado."));
+                new DadoInexistenteException("Prontuário não encontrado."));
 
 
         File arquivo = fileRepository.saveAndFlush(

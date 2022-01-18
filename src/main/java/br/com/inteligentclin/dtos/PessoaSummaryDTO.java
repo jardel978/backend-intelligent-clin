@@ -13,9 +13,9 @@ public class PessoaSummaryDTO {
 
     private Long id;
 
-    @NotNull(message = "Por gentileza, informe o sobrenome.")
+//    @NotNull(message = "Por gentileza, informe o sobrenome.")
     private String nome;
 
-    @NotNull(message = "O nome deve ser preenchido.")
+//    @NotNull(message = "O nome deve ser preenchido.")
     private String sobrenome;
 }

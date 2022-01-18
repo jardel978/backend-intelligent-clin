@@ -8,11 +8,10 @@ import br.com.inteligentclin.entity.Paciente;
 import br.com.inteligentclin.repository.IEnderecoRepository;
 import br.com.inteligentclin.repository.IPacienteRepository;
 import br.com.inteligentclin.repository.PessoaCustomRepository;
-import br.com.inteligentclin.service.exception.DadoExistenteException;
+import br.com.inteligentclin.service.exception.DadoInexistenteException;
 import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
 import br.com.inteligentclin.service.utils.UtilDate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -58,7 +57,7 @@ public class PacienteService {
 
     public Optional<PacienteModelDTO> buscarPorId(Long id) {
         Paciente paciente = pacienteRepository.findById(id)
-                .orElseThrow(() -> new DadoExistenteException("Paciente não encontrado"));
+                .orElseThrow(() -> new DadoInexistenteException("Paciente não encontrado"));
 
         paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
         return Optional.ofNullable(pacienteConverter.mapEntityToModelDTO(paciente,
@@ -90,7 +89,7 @@ public class PacienteService {
 
     public void excluirPorId(Long id) throws EntidadeRelacionadaException {
         Paciente paciente = pacienteRepository.findById(id).orElseThrow(() ->
-                new DadoExistenteException("O Paciente informado não pode ser localizado na base de dados."));
+                new DadoInexistenteException("O Paciente informado não pode ser localizado na base de dados."));
         boolean temProntuario = paciente.getProntuario() != null;
         boolean temConsulta = !paciente.getConsultas().isEmpty();
         String baseMensagemException = "Por questões de segurança de dados, não é possível excluir o(a) " +
@@ -118,7 +117,7 @@ public class PacienteService {
 
         pacienteDaBase.setNome(pacienteDTO.getNome());
         pacienteDaBase.setSobrenome(pacienteDTO.getSobrenome());
-        pacienteDaBase.setDataCadastro(pacienteDTO.getDataCadastro());
+//        pacienteDaBase.setDataCadastro(pacienteDTO.getDataCadastro());
         pacienteDaBase.setCpf(pacienteDTO.getCpf());
         pacienteDaBase.setEmail(pacienteDTO.getEmail());
         pacienteDaBase.setTelefone(pacienteDTO.getTelefone());

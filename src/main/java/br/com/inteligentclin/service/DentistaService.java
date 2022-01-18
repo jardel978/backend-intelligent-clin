@@ -7,10 +7,9 @@ import br.com.inteligentclin.entity.Dentista;
 import br.com.inteligentclin.entity.enums.Especialidade;
 import br.com.inteligentclin.repository.IDentistaRepository;
 import br.com.inteligentclin.repository.PessoaCustomRepository;
-import br.com.inteligentclin.service.exception.DadoExistenteException;
+import br.com.inteligentclin.service.exception.DadoInexistenteException;
 import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +39,7 @@ public class DentistaService {
 
     public Optional<DentistaModelDTO> buscarPorId(Long id) {
         Dentista dentista = dentistaRepository.findById(id).orElseThrow(() ->
-                new DadoExistenteException("Dentista não encontrado.")
+                new DadoInexistenteException("Dentista não encontrado.")
         );
 
         return Optional.ofNullable(dentistaConverter.mapEntityToModelDTO(dentista, DentistaModelDTO.class));
@@ -60,7 +59,7 @@ public class DentistaService {
 
     public DentistaModelDTO buscarPorMatricula(String numMatricula) {
         Dentista dentista = dentistaRepository.findByMatriculaContains(numMatricula).orElseThrow(() ->
-                new DadoExistenteException("Não localizamos um Dentista com a série de matrícula informada.")
+                new DadoInexistenteException("Não localizamos um Dentista com a série de matrícula informada.")
         );
 
         return dentistaConverter.mapEntityToModelDTO(dentista, DentistaModelDTO.class);
@@ -78,7 +77,7 @@ public class DentistaService {
 
     public void excluirPorId(Long id) throws EntidadeRelacionadaException {
         Dentista dentista = dentistaRepository.findById(id).orElseThrow(() ->
-                new DadoExistenteException("Dentista não encontrado."));
+                new DadoInexistenteException("Dentista não encontrado."));
 
         boolean temConsultas = !dentista.getConsultas().isEmpty();
         boolean temProntuarios = !dentista.getProntuarios().isEmpty();
@@ -97,7 +96,7 @@ public class DentistaService {
     public void atualizar(Long id, DentistaModelDTO dentistaDTO) {
         DentistaModelDTO dentistaDaBase =
                 buscarPorId(id).orElseThrow(() ->
-                        new DadoExistenteException("Dentista não encontrado.")
+                        new DadoInexistenteException("Dentista não encontrado.")
                 );
         dentistaDaBase.setNome(dentistaDTO.getNome());
         dentistaDaBase.setSobrenome(dentistaDTO.getSobrenome());

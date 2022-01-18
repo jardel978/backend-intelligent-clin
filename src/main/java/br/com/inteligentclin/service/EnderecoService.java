@@ -5,11 +5,10 @@ import br.com.inteligentclin.dtos.enderecoDTO.EnderecoModelDTO;
 import br.com.inteligentclin.dtos.enderecoDTO.EnderecoSummaryDTO;
 import br.com.inteligentclin.entity.Endereco;
 import br.com.inteligentclin.repository.IEnderecoRepository;
-import br.com.inteligentclin.service.exception.DadoExistenteException;
+import br.com.inteligentclin.service.exception.DadoInexistenteException;
 import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
 import br.com.inteligentclin.service.utils.UtilDate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,7 @@ public class EnderecoService {
 
     public Optional<EnderecoModelDTO> buscarPorId(Long id) {
         Endereco endereco = enderecoRepository.findById(id).orElseThrow(() ->
-                new DadoExistenteException("Endereço não encontrado."));
+                new DadoInexistenteException("Endereço não encontrado."));
 
         endereco.getPacientes().stream().forEach(paciente -> {
             paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
@@ -63,7 +62,7 @@ public class EnderecoService {
     }
 
     public void excluirPorId(Long id) throws EntidadeRelacionadaException {
-        Endereco endereco = enderecoRepository.findById(id).orElseThrow(() -> new DadoExistenteException("" +
+        Endereco endereco = enderecoRepository.findById(id).orElseThrow(() -> new DadoInexistenteException("" +
                 "Não foi possível localizar o endereço informado na base de dados."));
         boolean temPacinetes = !endereco.getPacientes().isEmpty();
         if (temPacinetes)
@@ -73,7 +72,7 @@ public class EnderecoService {
     }
 
     public void atualizar(Long id, EnderecoModelDTO enderecoDTO) {
-        EnderecoModelDTO enderecoDaBase = buscarPorId(id).orElseThrow(() -> new DadoExistenteException(
+        EnderecoModelDTO enderecoDaBase = buscarPorId(id).orElseThrow(() -> new DadoInexistenteException(
                 "Endereço não encontrado")
         );
         enderecoDaBase.setRua(enderecoDTO.getRua());

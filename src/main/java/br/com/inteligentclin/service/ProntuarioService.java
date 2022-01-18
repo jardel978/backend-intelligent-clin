@@ -9,7 +9,7 @@ import br.com.inteligentclin.entity.Prontuario;
 import br.com.inteligentclin.repository.IDentistaRepository;
 import br.com.inteligentclin.repository.IPacienteRepository;
 import br.com.inteligentclin.repository.IProntuarioRepository;
-import br.com.inteligentclin.service.exception.DadoExistenteException;
+import br.com.inteligentclin.service.exception.DadoInexistenteException;
 import br.com.inteligentclin.service.exception.ValidadeProntuarioException;
 import br.com.inteligentclin.service.utils.UtilDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +43,13 @@ public class ProntuarioService {
     public ProntuarioModelDTO salvar(ProntuarioModelDTO prontuarioDTO, Long idPaciente, Long idDentista) {
         Prontuario prontuario = prontuarioConverter.mapModelDTOToEntity(prontuarioDTO, Prontuario.class);
 
-        Paciente paciente = pacienteRepository.findById(idPaciente).orElseThrow(() -> new DadoExistenteException(
+        Paciente paciente = pacienteRepository.findById(idPaciente).orElseThrow(() -> new DadoInexistenteException(
                 "O Paciente informado não foi encontrado na base de dados."
         ));
 
         paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
 
-        Dentista dentista = dentistaRepository.findById(idDentista).orElseThrow(() -> new DadoExistenteException(
+        Dentista dentista = dentistaRepository.findById(idDentista).orElseThrow(() -> new DadoInexistenteException(
                 "O Dentista informado não foi encontrado na base de dados."));
 
         try {
@@ -73,7 +73,7 @@ public class ProntuarioService {
     }
 
     public Optional<ProntuarioModelDTO> buscarPorId(Long id) {
-        Prontuario prontuario = prontuarioRepository.findById(id).orElseThrow(() -> new DadoExistenteException(
+        Prontuario prontuario = prontuarioRepository.findById(id).orElseThrow(() -> new DadoInexistenteException(
                 "Prontuário não encontrado."
         ));
 
@@ -94,7 +94,7 @@ public class ProntuarioService {
     }
 
     public void excluirPorId(Long id) throws ValidadeProntuarioException {
-        Prontuario prontuario = prontuarioRepository.findById(id).orElseThrow(() -> new DadoExistenteException(
+        Prontuario prontuario = prontuarioRepository.findById(id).orElseThrow(() -> new DadoInexistenteException(
                 "Prontuário não encontrado."
         ));
 

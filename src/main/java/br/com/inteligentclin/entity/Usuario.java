@@ -3,6 +3,8 @@ package br.com.inteligentclin.entity;
 import br.com.inteligentclin.entity.enums.Cargo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -28,15 +30,14 @@ public class Usuario extends Pessoa implements Serializable {
     @GeneratedValue(generator = "usuario", strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @NotNull(message = "É necessário informar um login para o novo usuário.")
-    @Size(min = 8, max = 15, message = "Seu endereço de login deve ter no mínimo 8 dígitos.")
+    @Column(unique = true)
     private String login;
 
-    @Size(min = 6, max = 15, message = "Sua senha deve ter no mínimo 6 dígitos.")
     private String senha;
 
-//    @JsonManagedReference
+    //    @JsonManagedReference
     @JsonIgnore
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Set<Consulta> consultas = new HashSet<>();
 
