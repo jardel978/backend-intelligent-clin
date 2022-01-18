@@ -6,6 +6,7 @@ import br.com.inteligentclin.dtos.enderecoDTO.EnderecoSummaryDTO;
 import br.com.inteligentclin.entity.Endereco;
 import br.com.inteligentclin.repository.IEnderecoRepository;
 import br.com.inteligentclin.service.exception.DadoExistenteException;
+import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
 import br.com.inteligentclin.service.utils.UtilDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -51,7 +52,7 @@ public class EnderecoService {
         List<Endereco> enderecosSemPacientesRelacionados =
                 enderecoRepository.findByListPacientesIsEmpty();
 
-        enderecosSemPacientesRelacionados.stream()
+        enderecosSemPacientesRelacionados
                 .forEach(endereco -> {
                     enderecoRepository.delete(endereco);
                 });
@@ -61,13 +62,14 @@ public class EnderecoService {
                 EnderecoSummaryDTO.class));
     }
 
-    public void excluirPorId(Long id) {
-        try {
-            enderecoRepository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new DataIntegrityViolationException("Não é possível excluir um endereço que está vinculado a um " +
-                    "paciente.");
-        }
+    public void excluirPorId(Long id) throws EntidadeRelacionadaException {
+        Endereco endereco = enderecoRepository.findById(id).orElseThrow(() -> new DadoExistenteException("" +
+                "Não foi possível localizar o endereço informado na base de dados."));
+        boolean temPacinetes = !endereco.getPacientes().isEmpty();
+        if (temPacinetes)
+            throw new EntidadeRelacionadaException("Não é possível excluir um endereço que está vinculado a um " +
+                    "ou mais pacientes.");
+        enderecoRepository.deleteById(id);
     }
 
     public void atualizar(Long id, EnderecoModelDTO enderecoDTO) {

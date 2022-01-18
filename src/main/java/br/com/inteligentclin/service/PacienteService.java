@@ -9,6 +9,7 @@ import br.com.inteligentclin.repository.IEnderecoRepository;
 import br.com.inteligentclin.repository.IPacienteRepository;
 import br.com.inteligentclin.repository.PessoaCustomRepository;
 import br.com.inteligentclin.service.exception.DadoExistenteException;
+import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
 import br.com.inteligentclin.service.utils.UtilDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -87,27 +88,26 @@ public class PacienteService {
         });
     }
 
-    public void excluirPorId(Long id) {
-        try {
-            buscarPorId(id)
-                    .map(paciente -> {
-//                        verificar se o endereço existe,
-                        Endereco enderecoExite = verificarEnderecoExistente(paciente.getEndereco());
+    public void excluirPorId(Long id) throws EntidadeRelacionadaException {
+        Paciente paciente = pacienteRepository.findById(id).orElseThrow(() ->
+                new DadoExistenteException("O Paciente informado não pode ser localizado na base de dados."));
+        boolean temProntuario = paciente.getProntuario() != null;
+        boolean temConsulta = !paciente.getConsultas().isEmpty();
+        String baseMensagemException = "Por questões de segurança de dados, não é possível excluir o(a) " +
+                "paciente: " + paciente.getNome() + " " + paciente.getSobrenome() + " pois está vinculado(a) a ";
+        if (temProntuario && temConsulta)
+            throw new EntidadeRelacionadaException(baseMensagemException + "um prontuário e a uma ou mais consultas.");
+        if (temProntuario)
+            throw new EntidadeRelacionadaException(baseMensagemException + "um prontuário.");
+        if (temConsulta)
+            throw new EntidadeRelacionadaException(baseMensagemException + "uma ou mais consultas.");
+//      verificar se o endereço existe,
+        Endereco enderecoExite = verificarEnderecoExistente(paciente.getEndereco());
 //                        se ele não tem associação com mais de um paciente e só assim excluí-lo
-                        if (enderecoExite != null && enderecoExite.getPacientes().size() == 1) {
-                            enderecoRepository.delete(enderecoExite);
-                        }
+        if (enderecoExite != null && enderecoExite.getPacientes().size() == 1)
+            enderecoRepository.delete(enderecoExite);
 
-                        pacienteRepository.deleteById(paciente.getId());
-                        return Void.TYPE;
-                    }).orElseThrow(() -> new DadoExistenteException(
-                            "Paciente não encontrado")
-                    );
-
-        } catch (DataIntegrityViolationException e) {
-            throw new DataIntegrityViolationException("Não é possível excluir um paciente que está vinculado a uma " +
-                    "consulta.");
-        }
+        pacienteRepository.deleteById(paciente.getId());
     }
 
 

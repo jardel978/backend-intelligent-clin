@@ -3,6 +3,7 @@ package br.com.inteligentclin.controller;
 import br.com.inteligentclin.dtos.enderecoDTO.EnderecoModelDTO;
 import br.com.inteligentclin.dtos.enderecoDTO.EnderecoSummaryDTO;
 import br.com.inteligentclin.service.EnderecoService;
+import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -42,20 +43,8 @@ public class EnderecoController {
     @DeleteMapping("/{id}")
     @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void excluirPorId(@PathVariable("id") Long id) {
-        try {
-            enderecoService.buscarPorId(id)
-                    .map(endereco -> {
-                        enderecoService.excluirPorId(endereco.getId());
-                        return Void.TYPE;
-                    }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Endereço não encontrado")
-                    );
-        } catch (
-                DataIntegrityViolationException e) {
-            throw new DataIntegrityViolationException("Não é possível excluir um endereço que está vinculado a um " +
-                    "paciente.");
-        }
+    public void excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
+        enderecoService.excluirPorId(id);
     }
 
     @PutMapping("/{id}")

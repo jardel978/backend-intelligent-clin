@@ -4,6 +4,7 @@ import br.com.inteligentclin.controller.exception.ConstraintException;
 import br.com.inteligentclin.dtos.pacienteDTO.PacienteModelDTO;
 import br.com.inteligentclin.dtos.pacienteDTO.PacienteSummaryDTO;
 import br.com.inteligentclin.service.PacienteService;
+import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,7 +58,7 @@ public class PacienteController {
     @DeleteMapping("/{id}")
     @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void excluirPorId(@PathVariable("id") Long id) {
+    public void excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
         pacienteService.excluirPorId(id);
     }
 

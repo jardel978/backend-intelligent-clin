@@ -80,16 +80,16 @@ public class DentistaService {
         Dentista dentista = dentistaRepository.findById(id).orElseThrow(() ->
                 new DadoExistenteException("Dentista não encontrado."));
 
-        boolean temConsultas = dentista.getConsultas().isEmpty();
-        boolean temProntuarios = dentista.getProntuarios().isEmpty();
-        if (!temProntuarios && !temConsultas)
-            throw new EntidadeRelacionadaException("O dentista " + dentista.getNome() + " " + dentista.getSobrenome()
+        boolean temConsultas = !dentista.getConsultas().isEmpty();
+        boolean temProntuarios = !dentista.getProntuarios().isEmpty();
+        if (temProntuarios && temConsultas)
+            throw new EntidadeRelacionadaException("O(A) dentista " + dentista.getNome() + " " + dentista.getSobrenome()
                     + " possui consultas e prontuários sob sua responsabilidade. Não é possível excluí-lo.");
-        if (!temConsultas)
-            throw new EntidadeRelacionadaException("Não é possível excluir o dentista: " + dentista.getNome() + " " + dentista.getSobrenome()
+        if (temConsultas)
+            throw new EntidadeRelacionadaException("Não é possível excluir o(a) dentista: " + dentista.getNome() + " " + dentista.getSobrenome()
                     + " pois está vinculado a uma ou mais consultas.");
-        if (!temProntuarios)
-            throw new EntidadeRelacionadaException("Não é possível excluir o dentista: " + dentista.getNome() + " " + dentista.getSobrenome()
+        if (temProntuarios)
+            throw new EntidadeRelacionadaException("Não é possível excluir o(a) dentista: " + dentista.getNome() + " " + dentista.getSobrenome()
                     + " pois está vinculado a um ou mais prontuários.");
         dentistaRepository.deleteById(dentista.getId());
     }
