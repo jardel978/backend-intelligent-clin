@@ -40,6 +40,16 @@ public class UsuarioController {
         return usuarioService.buscarPorId(id).get();
     }
 
+    @GetMapping("/custom")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<UsuarioModelDTO> buscarCustomizado(Pageable pageable,
+                                                   @RequestParam(value = "id", required = false) Long id,
+                                                   @RequestParam(value = "nome", required = false) String nome,
+                                                   @RequestParam(value = "sobrenome", required = false) String sobrenome,
+                                                   @RequestParam(value = "cpf", required = false) String cpf) {
+        return usuarioService.buscarCustomizado(pageable, id, nome, sobrenome, cpf);
+    }
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<UsuarioSummaryDTO> buscarTodos(Pageable pageable) {

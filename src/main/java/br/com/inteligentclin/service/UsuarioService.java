@@ -5,14 +5,17 @@ import br.com.inteligentclin.dtos.usuarioDTO.UsuarioModelDTO;
 import br.com.inteligentclin.dtos.usuarioDTO.UsuarioSummaryDTO;
 import br.com.inteligentclin.entity.Usuario;
 import br.com.inteligentclin.repository.IUsuarioRepository;
+import br.com.inteligentclin.repository.PessoaCustomRepository;
 import br.com.inteligentclin.service.exception.DadoExistenteException;
 import br.com.inteligentclin.service.exception.DadoInexistenteException;
 import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +27,9 @@ public class UsuarioService {
     @Autowired
     private UsuarioModelMapperConverter usuarioConverter;
 
+    @Autowired
+    private PessoaCustomRepository<Usuario> usuarioModelCustomRepository;
+
     public UsuarioModelDTO salvar(UsuarioModelDTO usuarioDTO) throws DadoExistenteException {
         Optional<Usuario> usuarioBase = usuarioRepository.findByLogin(usuarioDTO.getLogin());
         if (usuarioBase.isPresent())
@@ -32,6 +38,17 @@ public class UsuarioService {
         Usuario usuario = usuarioConverter.mapModelDTOToEntity(usuarioDTO, Usuario.class);
         Usuario usuarioSalvo = usuarioRepository.saveAndFlush(usuario);
         return usuarioConverter.mapEntityToModelDTO(usuarioSalvo, UsuarioModelDTO.class);
+    }
+
+    public Page<UsuarioModelDTO> buscarCustomizado(Pageable pageable,
+                                                   Long id,
+                                                   String nome,
+                                                   String sobrenome,
+                                                   String cpf) {
+        List<Usuario> lista = usuarioModelCustomRepository.find(id, nome, sobrenome, cpf, Usuario.class);
+        Page<Usuario> pageUsuarios = new PageImpl<>(lista, pageable, lista.stream().count());
+        return pageUsuarios.map(usuario ->
+                usuarioConverter.mapEntityToModelDTO(usuario, UsuarioModelDTO.class));
     }
 
     public Optional<UsuarioModelDTO> buscarPorId(Long id) {
