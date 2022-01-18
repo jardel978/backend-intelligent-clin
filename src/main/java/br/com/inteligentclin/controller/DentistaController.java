@@ -5,6 +5,7 @@ import br.com.inteligentclin.dtos.dentistaDTO.DentistaModelDTO;
 import br.com.inteligentclin.dtos.dentistaDTO.DentistaSummaryDTO;
 import br.com.inteligentclin.entity.enums.Especialidade;
 import br.com.inteligentclin.service.DentistaService;
+import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -82,14 +83,8 @@ public class DentistaController {
     @DeleteMapping("/{id}")
     @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void excluirPorId(@PathVariable("id") Long id) {
-        dentistaService.buscarPorId(id)
-                .map(dentista -> {
-                    dentistaService.excluirPorId(dentista.getId());
-                    return Void.TYPE;
-                }).orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Dentista não encontrado.")
-                );
+    public void excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
+        dentistaService.excluirPorId(id);
     }
 
     @PutMapping("/{id}")
@@ -105,7 +100,7 @@ public class DentistaController {
         try {
             dentistaService.atualizar(id, dentistaDTO);
         } catch (ResponseStatusException e) {
-            new ResponseStatusException(HttpStatus.NOT_FOUND, "Dentista não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Dentista não encontrado.");
         }
     }
 }

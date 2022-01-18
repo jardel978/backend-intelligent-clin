@@ -8,8 +8,9 @@ import br.com.inteligentclin.entity.enums.Especialidade;
 import br.com.inteligentclin.repository.IDentistaRepository;
 import br.com.inteligentclin.repository.PessoaCustomRepository;
 import br.com.inteligentclin.service.exception.DadoExistenteException;
+import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -75,13 +76,22 @@ public class DentistaService {
         return dentistasPage.map(dentista -> dentistaConverter.mapEntityToSummaryDTO(dentista, DentistaSummaryDTO.class));
     }
 
-    public void excluirPorId(Long id) {
-        try {
-            dentistaRepository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new DataIntegrityViolationException("Não é possível excluir um dentista que está vinculado a uma " +
-                    "consulta.");
-        }
+    public void excluirPorId(Long id) throws EntidadeRelacionadaException {
+        Dentista dentista = dentistaRepository.findById(id).orElseThrow(() ->
+                new DadoExistenteException("Dentista não encontrado."));
+
+        boolean temConsultas = dentista.getConsultas().isEmpty();
+        boolean temProntuarios = dentista.getProntuarios().isEmpty();
+        if (!temProntuarios && !temConsultas)
+            throw new EntidadeRelacionadaException("O dentista " + dentista.getNome() + " " + dentista.getSobrenome()
+                    + " possui consultas e prontuários sob sua responsabilidade. Não é possível excluí-lo.");
+        if (!temConsultas)
+            throw new EntidadeRelacionadaException("Não é possível excluir o dentista: " + dentista.getNome() + " " + dentista.getSobrenome()
+                    + " pois está vinculado a uma ou mais consultas.");
+        if (!temProntuarios)
+            throw new EntidadeRelacionadaException("Não é possível excluir o dentista: " + dentista.getNome() + " " + dentista.getSobrenome()
+                    + " pois está vinculado a um ou mais prontuários.");
+        dentistaRepository.deleteById(dentista.getId());
     }
 
     public void atualizar(Long id, DentistaModelDTO dentistaDTO) {

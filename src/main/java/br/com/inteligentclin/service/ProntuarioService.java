@@ -13,11 +13,13 @@ import br.com.inteligentclin.service.exception.DadoExistenteException;
 import br.com.inteligentclin.service.exception.ValidadeProntuarioException;
 import br.com.inteligentclin.service.utils.UtilDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -42,13 +44,13 @@ public class ProntuarioService {
         Prontuario prontuario = prontuarioConverter.mapModelDTOToEntity(prontuarioDTO, Prontuario.class);
 
         Paciente paciente = pacienteRepository.findById(idPaciente).orElseThrow(() -> new DadoExistenteException(
-                "Paciente não encontrado."
+                "O Paciente informado não foi encontrado na base de dados."
         ));
 
         paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
 
         Dentista dentista = dentistaRepository.findById(idDentista).orElseThrow(() -> new DadoExistenteException(
-                "Dentista não encontrado."));
+                "O Dentista informado não foi encontrado na base de dados."));
 
         try {
             if (paciente.getProntuario() == null) {
@@ -76,7 +78,8 @@ public class ProntuarioService {
         ));
 
         Paciente paciente = prontuario.getPaciente();
-        paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
+        if (paciente != null)
+            paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
         return Optional.ofNullable(prontuarioConverter.mapEntityToModelDTO(prontuario, ProntuarioModelDTO.class));
     }
 
@@ -84,7 +87,8 @@ public class ProntuarioService {
         Page<Prontuario> pageProntuarios = prontuarioRepository.findAll(pageable);
         return pageProntuarios.map(prontuario -> {
             Paciente paciente = prontuario.getPaciente();
-            paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
+            if (paciente != null)
+                paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
             return prontuarioConverter.mapEntityToSummaryDTO(prontuario, ProntuarioSummaryDTO.class);
         });
     }
@@ -94,10 +98,18 @@ public class ProntuarioService {
                 "Prontuário não encontrado."
         ));
 
-        LocalDate ultimaAtualizacao = prontuario.getUltimaAlteracao().toLocalDate();
+        LocalDateTime ultimaAtualizacao = prontuario.getUltimaAlteracao();
 
-        if (prontuario.getPaciente() == null && utilDate.verificarValidadeProntuario(ultimaAtualizacao)) {
+        if (ultimaAtualizacao == null)
+            ultimaAtualizacao = prontuario.getDataCriacao();
+
+        if (prontuario.getPaciente() == null && utilDate.verificarValidadeProntuario(ultimaAtualizacao.toLocalDate())) {
             prontuarioRepository.deleteById(id);
+        } else if (prontuario.getPaciente() != null) {
+            throw new DataIntegrityViolationException("Esse prontuário está vinculado ao paciente: " +
+                    prontuario.getPaciente().getNome() + " " +
+                    prontuario.getPaciente().getSobrenome() +
+                    ". Não é possível excluí-lo.");
         } else
             throw new ValidadeProntuarioException("Impossível excluir Prontuário. Com base na Resolução do CFO nº91/2009," +
                     " o tempo mínimo para a manutenção de prontuários odontológicos em suporte de papel são 10 (dez) anos," +

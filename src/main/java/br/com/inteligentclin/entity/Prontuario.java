@@ -42,7 +42,7 @@ public class Prontuario implements Serializable {
     private String evolucaoTratamento;
 
     @Column(name = "data_criacao")
-    private LocalDateTime dataCriacao;
+    private LocalDateTime dataCriacao = LocalDateTime.now();
 
     @Column(name = "ultima_alteracao")
     private LocalDateTime ultimaAlteracao;
@@ -50,11 +50,6 @@ public class Prontuario implements Serializable {
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "file_id", foreignKey = @ForeignKey(name = "fk_file_prontuario"))
     private File file;
-
-    @PrePersist
-    public void gerarDataCriacao() {
-        this.dataCriacao = LocalDateTime.now();
-    }
 
     @PreUpdate
     public void gerarUltimaAlteracao() {

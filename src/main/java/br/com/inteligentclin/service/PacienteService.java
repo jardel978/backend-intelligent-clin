@@ -59,10 +59,9 @@ public class PacienteService {
         Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> new DadoExistenteException("Paciente não encontrado"));
 
-        Optional<PacienteModelDTO> pacienteDTO = Optional.ofNullable(pacienteConverter.mapEntityToModelDTO(paciente,
+        paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
+        return Optional.ofNullable(pacienteConverter.mapEntityToModelDTO(paciente,
                 PacienteModelDTO.class));
-        pacienteDTO.get().setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
-        return pacienteDTO;
     }
 
     public Page<PacienteModelDTO> buscarCustomizado(Pageable pageable,
@@ -95,9 +94,8 @@ public class PacienteService {
 //                        verificar se o endereço existe,
                         Endereco enderecoExite = verificarEnderecoExistente(paciente.getEndereco());
 //                        se ele não tem associação com mais de um paciente e só assim excluí-lo
-                        if (enderecoExite != null) {
-                            if (enderecoExite.getPacientes().size() == 1)
-                                enderecoRepository.delete(enderecoExite);
+                        if (enderecoExite != null && enderecoExite.getPacientes().size() == 1) {
+                            enderecoRepository.delete(enderecoExite);
                         }
 
                         pacienteRepository.deleteById(paciente.getId());
@@ -127,20 +125,16 @@ public class PacienteService {
         pacienteDaBase.setDataNascimento(pacienteDTO.getDataNascimento());
         pacienteDaBase.setEndereco(pacienteDTO.getEndereco());
         pacienteDaBase.setConsultas(pacienteDTO.getConsultas());
-        pacienteDaBase.setProntuario(pacienteDTO.getProntuario());
+//        pacienteDaBase.setProntuario(pacienteDTO.getProntuario());
         pacienteDaBase.setSexo(pacienteDTO.getSexo());
         salvar(pacienteDaBase);
     }
 
     public Endereco verificarEnderecoExistente(Endereco endereco) {
-        Endereco enderecoBase = enderecoRepository.findByRuaAndNumeroAndBairro(
+        return enderecoRepository.findByRuaAndNumeroAndBairro(
                 endereco.getRua(),
                 endereco.getNumero(),
                 endereco.getBairro()
         );
-        if (enderecoBase != null)
-            return enderecoBase;
-        else
-            return null;
     }
 }
