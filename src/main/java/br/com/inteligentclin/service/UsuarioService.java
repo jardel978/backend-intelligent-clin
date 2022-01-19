@@ -4,6 +4,7 @@ import br.com.inteligentclin.dtos.converters.UsuarioModelMapperConverter;
 import br.com.inteligentclin.dtos.usuarioDTO.UsuarioModelDTO;
 import br.com.inteligentclin.dtos.usuarioDTO.UsuarioSummaryDTO;
 import br.com.inteligentclin.entity.Usuario;
+import br.com.inteligentclin.entity.enums.Cargo;
 import br.com.inteligentclin.repository.IUsuarioRepository;
 import br.com.inteligentclin.repository.PessoaCustomRepository;
 import br.com.inteligentclin.service.exception.DadoExistenteException;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -49,6 +51,25 @@ public class UsuarioService {
         Page<Usuario> pageUsuarios = new PageImpl<>(lista, pageable, lista.stream().count());
         return pageUsuarios.map(usuario ->
                 usuarioConverter.mapEntityToModelDTO(usuario, UsuarioModelDTO.class));
+    }
+
+    public List<UsuarioModelDTO> buscarPorEmail(String email) {
+        List<Usuario> lista = usuarioRepository.findByEmailContains(email);
+        if (lista.isEmpty())
+            throw new DadoInexistenteException("Nenhum dentista foi encontrado com o email informado.");
+        return usuarioConverter.convertListEntityToModelDTO(lista, UsuarioModelDTO.class);
+    }
+
+    public List<UsuarioModelDTO> buscarPorCargo(String cargo) {
+        try {
+            Cargo stringParaEnum = Cargo.valueOf(cargo.toUpperCase());
+            List<Usuario> lista = usuarioRepository.findByCargo(stringParaEnum);
+            if (lista.isEmpty())
+                throw new DadoInexistenteException("Nenhum usuário foi encontrado para o cargo de " + cargo.toUpperCase(Locale.ROOT));
+            return usuarioConverter.convertListEntityToModelDTO(lista, UsuarioModelDTO.class);
+        } catch (IllegalArgumentException e) {
+            throw new DadoInexistenteException("O cargo informado está inválido.");
+        }
     }
 
     public Optional<UsuarioModelDTO> buscarPorId(Long id) {

@@ -12,6 +12,6 @@ public interface IPessoaBaseRepository<T extends Pessoa> extends JpaRepository<T
 //    List<T> findByNomeContains(String nome);
 //    List<T> findBySobrenomeContains(String sobrenome);
 //    T findByCpf(String cpf);
-    List<T> findByEmail(String email);
+    List<T> findByEmailContains(String email);
 
 }

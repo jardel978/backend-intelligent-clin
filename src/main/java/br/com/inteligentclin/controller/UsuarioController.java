@@ -15,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -48,6 +49,18 @@ public class UsuarioController {
                                                    @RequestParam(value = "sobrenome", required = false) String sobrenome,
                                                    @RequestParam(value = "cpf", required = false) String cpf) {
         return usuarioService.buscarCustomizado(pageable, id, nome, sobrenome, cpf);
+    }
+
+    @GetMapping("/email")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UsuarioModelDTO> buscarPorEmail(@RequestParam(value = "email") String email) {
+        return usuarioService.buscarPorEmail(email);
+    }
+
+    @GetMapping("/cargos")
+    @ResponseStatus(HttpStatus.OK)
+    List<UsuarioModelDTO> buscarProCargo(@RequestParam(value = "cargo") String cargo) {
+        return usuarioService.buscarPorCargo(cargo);
     }
 
     @GetMapping

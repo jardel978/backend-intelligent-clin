@@ -36,16 +36,16 @@ public class GenericModelMapperConverter<E, M, S> {
         return modelMapper.map(entity, summaryClassDestination);
     }
 
-//    public List<M> convertListEntityToModelDTO(List<E> listEntity, Class<M> modelClassDestination) {
-//
-//        List<M> listSummaryDTO = new ArrayList<>();
-//
-//        listEntity.stream().forEach(entity -> {
-//            M modelDTO = mapEntityToModelDTO(entity, modelClassDestination);
-//            listSummaryDTO.add(modelDTO);
-//        });
-//        return listSummaryDTO;
-//    }
+    public List<M> convertListEntityToModelDTO(List<E> listEntity, Class<M> modelClassDestination) {
+
+        List<M> listSummaryDTO = new ArrayList<>();
+
+        listEntity.stream().forEach(entity -> {
+            M modelDTO = mapEntityToModelDTO(entity, modelClassDestination);
+            listSummaryDTO.add(modelDTO);
+        });
+        return listSummaryDTO;
+    }
 
 //    public List<S> convertListEntityToSummaryDTO(List<E> listEntity, Class<S> summaryClassDestination) {
 //
