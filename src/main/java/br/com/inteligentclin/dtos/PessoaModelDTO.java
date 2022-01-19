@@ -38,5 +38,6 @@ public class PessoaModelDTO {
 
     @Pattern(regexp = "^\\(?(?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])\\)? ?(?:[2-8]|9[1-9])[0-9]{3}\\-?[0-9]{4}$", message =
             "Formato de número de telefone inválido. Tente: xx xxxxx-xxxx e verifique se o DDD está correto.")
+    @NotNull(message = "É necessário informar um número de telefone para contato.")
     private String telefone;
 }

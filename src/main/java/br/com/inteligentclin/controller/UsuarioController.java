@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class UsuarioController {
     private ModelMapper modelMapper;
 
     @PostMapping
+    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioModelDTO salvar(@Valid @RequestBody UsuarioModelDTO usuarioDTO, BindingResult bgresult) throws DadoExistenteException {
         if (bgresult.hasErrors())
@@ -70,12 +72,14 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
         usuarioService.excluirPorId(id);
     }
 
     @PutMapping("/{id}")
+    @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody UsuarioModelDTO usuarioDTO,
                           BindingResult bgresult) {

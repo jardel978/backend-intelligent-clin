@@ -47,6 +47,7 @@ public class ProntuarioController {
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     public void excluirPorId(@PathVariable("id") Long id) throws ValidadeProntuarioException {
         prontuarioService.excluirPorId(id);
     }

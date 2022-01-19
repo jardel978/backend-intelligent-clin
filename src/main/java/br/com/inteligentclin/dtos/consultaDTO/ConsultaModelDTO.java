@@ -4,15 +4,15 @@ import br.com.inteligentclin.entity.Dentista;
 import br.com.inteligentclin.entity.Paciente;
 import br.com.inteligentclin.entity.Usuario;
 import br.com.inteligentclin.entity.enums.StatusConsulta;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Builder
@@ -36,17 +36,21 @@ public class ConsultaModelDTO implements Serializable {
     private Usuario usuario;
 
     @NotNull(message = "Informe a data da consulta.")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate dataConsulta;
 
     @NotNull(message = "Informe o horário da consulta.")
-    @Pattern(regexp = "\\d{2}\\:\\d{2}", message = "Informe uma data no formato HH:mm")
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime horaConsulta;
 
     private String complemento;
 
-    @Digits(fraction = 2, integer = 3, message = "Informe um valor válido. Exemplo: R$ 100,00")
+    @Digits(fraction = 2, integer = 3, message = "Informe um valor monetário válido. Exemplo: R$ 100,00")
     private Double valor;
 
     private StatusConsulta status;
+
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime dataAtualizacaoStatus;
 
 }

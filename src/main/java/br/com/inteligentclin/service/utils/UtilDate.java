@@ -29,4 +29,8 @@ public class UtilDate implements Serializable {
         return period.getYears() >= 10;
     }
 
+    public Boolean verificarSeDataAnterior(LocalDate data) {
+        return data.isBefore(LocalDate.now());
+    }
+
 }
