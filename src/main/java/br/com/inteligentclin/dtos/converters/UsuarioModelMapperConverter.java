@@ -9,4 +9,10 @@ import org.springframework.stereotype.Component;
 public class UsuarioModelMapperConverter extends GenericModelMapperConverter<Usuario, UsuarioModelDTO,
         UsuarioSummaryDTO> {
 
+    @Override
+    public UsuarioModelDTO mapEntityToModelDTO(Usuario entity, Class<UsuarioModelDTO> modelClassDestination) {
+        UsuarioModelDTO usuarioModelDTO = getModelMapper().map(entity, modelClassDestination);
+        usuarioModelDTO.setSenha(null);
+        return usuarioModelDTO;
+    }
 }

@@ -6,11 +6,13 @@ import br.com.inteligentclin.dtos.usuarioDTO.UsuarioSummaryDTO;
 import br.com.inteligentclin.service.UsuarioService;
 import br.com.inteligentclin.service.exception.DadoExistenteException;
 import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
+import br.com.inteligentclin.service.exception.ParametroRequeridoException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,17 @@ public class UsuarioController {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
         return usuarioService.salvar(usuarioDTO);
+    }
+
+    @GetMapping("/validarSenha")
+    public ResponseEntity<Boolean> validarSenha(@RequestParam(value = "login", required = false) String login,
+                                                @RequestParam(value = "email", required = false) String email,
+                                                @RequestParam(value = "senha", required = false) String senha) throws ParametroRequeridoException {
+        boolean valido = usuarioService.validarSenha(login, email, senha);
+        if (valido)
+            return ResponseEntity.status(HttpStatus.OK).body(true);
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
     }
 
     @GetMapping("/{id}")

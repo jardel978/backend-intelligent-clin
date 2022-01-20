@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,12 +25,12 @@ public class PacienteController {
 
     @PostMapping
     @Transactional
-    @ResponseStatus(HttpStatus.CREATED)
-    public PacienteModelDTO salvar(@Valid @RequestBody PacienteModelDTO pacienteDTO, BindingResult bgresult) {
+//    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<PacienteModelDTO> salvar(@Valid @RequestBody PacienteModelDTO pacienteDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
-        return pacienteService.salvar(pacienteDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteService.salvar(pacienteDTO));
     }
 
     @GetMapping("/{id}")

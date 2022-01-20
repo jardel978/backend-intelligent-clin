@@ -10,10 +10,12 @@ import br.com.inteligentclin.repository.PessoaCustomRepository;
 import br.com.inteligentclin.service.exception.DadoExistenteException;
 import br.com.inteligentclin.service.exception.DadoInexistenteException;
 import br.com.inteligentclin.service.exception.EntidadeRelacionadaException;
+import br.com.inteligentclin.service.exception.ParametroRequeridoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,14 +34,34 @@ public class UsuarioService {
     @Autowired
     private PessoaCustomRepository<Usuario> usuarioModelCustomRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public UsuarioModelDTO salvar(UsuarioModelDTO usuarioDTO) throws DadoExistenteException {
         Optional<Usuario> usuarioBase = usuarioRepository.findByLogin(usuarioDTO.getLogin());
         if (usuarioBase.isPresent())
             throw new DadoExistenteException("O login: " + usuarioBase.get().getLogin() + " já existe. Tente outro " +
                     "diferente.");
         Usuario usuario = usuarioConverter.mapModelDTOToEntity(usuarioDTO, Usuario.class);
+        usuario.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
         Usuario usuarioSalvo = usuarioRepository.saveAndFlush(usuario);
         return usuarioConverter.mapEntityToModelDTO(usuarioSalvo, UsuarioModelDTO.class);
+    }
+
+    public Boolean validarSenha(String login, String email, String senha) throws ParametroRequeridoException {
+        Optional<Usuario> usuario = null;
+        if (login == null && email == null || senha == null)
+            throw new ParametroRequeridoException("É necessário informar um login ou endereço de email e uma senha " +
+                    "para validar o usuário.");
+        if ((login != null && email == null) || (login != null && email != null))
+            usuario = usuarioRepository.findByLogin(login);
+        if (login == null && email != null)
+            usuario = usuarioRepository.findByEmail(email);
+
+        if (usuario.isEmpty())
+            return false;
+
+        return passwordEncoder.matches(senha, usuario.get().getSenha());
     }
 
     public Page<UsuarioModelDTO> buscarCustomizado(Pageable pageable,
@@ -104,7 +126,7 @@ public class UsuarioService {
         usuarioDaBase.setCpf(usuarioDTO.getCpf());
         usuarioDaBase.setEmail(usuarioDTO.getEmail());
         usuarioDaBase.setTelefone(usuarioDTO.getTelefone());
-        usuarioDaBase.setSenha(usuarioDTO.getSenha());
+        usuarioDaBase.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
         usuarioDaBase.setCargo(usuarioDTO.getCargo());
         usuarioRepository.save(usuarioDaBase);
     }
