@@ -2,7 +2,7 @@ package br.com.inteligentclin.dtos.dentistaDTO;
 
 import br.com.inteligentclin.dtos.PessoaModelDTO;
 import br.com.inteligentclin.dtos.consultaDTO.ConsultaMixClasseModelDTO;
-import br.com.inteligentclin.entity.Prontuario;
+import br.com.inteligentclin.dtos.prontuarioDTO.ProntuarioMixDentistaModelDTO;
 import br.com.inteligentclin.entity.enums.Especialidade;
 import lombok.*;
 
@@ -27,6 +27,6 @@ public class DentistaModelDTO extends PessoaModelDTO implements Serializable {
 
     private Set<ConsultaMixClasseModelDTO> consultas;
 
-    private Set<Prontuario> prontuarios;
+    private Set<ProntuarioMixDentistaModelDTO> prontuarios;
 
 }
