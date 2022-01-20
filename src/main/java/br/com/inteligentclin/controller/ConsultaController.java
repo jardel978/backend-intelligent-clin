@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -24,45 +25,40 @@ public class ConsultaController {
 
     @PostMapping("/salvar")
     @Transactional
-    @ResponseStatus(HttpStatus.CREATED)
-    public ConsultaModelDTO salvar(@RequestBody ConsultaModelDTO consultaDTO,
-                                   @RequestParam(value = "idPaciente") Long idPaciente,
-                                   @RequestParam(value = "idDentista") Long idDentista,
-                                   @RequestParam(value = "idUsuario") Long idUsuario) {
-        return consultaService.salvar(consultaDTO, idPaciente, idDentista, idUsuario);
+    public ResponseEntity<ConsultaModelDTO> salvar(@RequestBody ConsultaModelDTO consultaDTO,
+                                                   @RequestParam(value = "idPaciente") Long idPaciente,
+                                                   @RequestParam(value = "idDentista") Long idDentista,
+                                                   @RequestParam(value = "idUsuario") Long idUsuario) {
+        ConsultaModelDTO consultaSalva = consultaService.salvar(consultaDTO, idPaciente, idDentista, idUsuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(consultaSalva);
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public ConsultaModelDTO buscarPorId(@PathVariable("id") Long id) {
-        return consultaService.buscarPorId(id);
+    public ResponseEntity<ConsultaModelDTO> buscarPorId(@PathVariable("id") Long id) {
+        ConsultaModelDTO consulta = consultaService.buscarPorId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(consulta);
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Page<ConsultaSummaryDTO> buscarTodos(Pageable pageable) {
         return consultaService.buscarTodos(pageable);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void excluirPorId(@PathVariable("id") Long id) {
+    public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) {
         consultaService.excluirPorId(id);
-//        consultaService.buscarPorId(id)
-//                .map(consulta -> {
-//                    consultaService.excluirPorId(consulta.getId());
-//                    return Void.TYPE;
-//                }).orElseThrow(() ->
-//                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada."));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/atualizar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void atualizar(@RequestParam("idConsulta") Long idConsulta, @RequestBody ConsultaModelDTO consultaDTO,
-                          @RequestParam(value = "idPaciente") Long idPaciente,
-                          @RequestParam(value = "idDentista") Long idDentista,
-                          @RequestParam(value = "idUsuario") Long idUsuario) {
+    public ResponseEntity<?> atualizar(@RequestParam("idConsulta") Long idConsulta,
+                                       @RequestBody ConsultaModelDTO consultaDTO,
+                                       @RequestParam(value = "idPaciente") Long idPaciente,
+                                       @RequestParam(value = "idDentista") Long idDentista,
+                                       @RequestParam(value = "idUsuario") Long idUsuario) {
         consultaService.atualizar(idConsulta, consultaDTO, idPaciente, idDentista, idUsuario);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

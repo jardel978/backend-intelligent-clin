@@ -32,13 +32,13 @@ public class EnderecoService {
 
     public EnderecoModelDTO salvar(EnderecoModelDTO enderecoDTO) {
         Endereco endereco = enderecoConverter.mapModelDTOToEntity(enderecoDTO, Endereco.class);
-        enderecoRepository.save(endereco);
-        return enderecoDTO;
+        Endereco enderecoSalvo = enderecoRepository.saveAndFlush(endereco);
+        return enderecoConverter.mapEntityToModelDTO(enderecoSalvo, EnderecoModelDTO.class);
     }
 
     public Optional<EnderecoModelDTO> buscarPorId(Long id) {
         Endereco endereco = enderecoRepository.findById(id).orElseThrow(() ->
-                new DadoInexistenteException("Endereço não encontrado."));
+                new DadoInexistenteException("Endereço não encontrado na base de dados."));
 
         endereco.getPacientes().stream().forEach(paciente -> {
             paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));

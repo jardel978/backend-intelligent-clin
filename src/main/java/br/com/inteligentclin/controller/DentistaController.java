@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -26,81 +26,72 @@ public class DentistaController {
 
     @PostMapping
     @Transactional
-    @ResponseStatus(HttpStatus.CREATED)
-    public DentistaModelDTO salvar(@Valid @RequestBody DentistaModelDTO dentistaDTO, BindingResult bgresult) {
+    public ResponseEntity<DentistaModelDTO> salvar(@Valid @RequestBody DentistaModelDTO dentistaDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
-        return dentistaService.salvar(dentistaDTO);
+        DentistaModelDTO dentistaSalvo = dentistaService.salvar(dentistaDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dentistaSalvo);
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public DentistaModelDTO buscarPorId(@PathVariable("id") Long id) {
-        return dentistaService.buscarPorId(id).get();
+    public ResponseEntity<DentistaModelDTO> buscarPorId(@PathVariable("id") Long id) {
+        DentistaModelDTO dentista = dentistaService.buscarPorId(id).get();
+        return ResponseEntity.status(HttpStatus.OK).body(dentista);
     }
 
-    //     http://localhost:8080/dentistas?size=1&page=0&custom?nome=nome&sobrenome=sobrenome (ou apenas nome, ou id,
-    //     cpf...)
     @GetMapping("/custom")
-    @ResponseStatus(HttpStatus.OK)
-    public Page<DentistaModelDTO> buscarCustomizado(Pageable pageable,
-                                                    @RequestParam(value = "id", required = false) Long id,
-                                                    @RequestParam(value = "nome", required = false) String nome,
-                                                    @RequestParam(value = "sobrenome", required = false) String sobrenome,
-                                                    @RequestParam(value = "cpf", required = false) String cpf) {
-        return dentistaService.buscarCustomizado(pageable, id, nome, sobrenome, cpf);
+    public ResponseEntity<Page<DentistaModelDTO>> buscarCustomizado(Pageable pageable,
+                                                                    @RequestParam(value = "id", required = false) Long id,
+                                                                    @RequestParam(value = "nome", required = false) String nome,
+                                                                    @RequestParam(value = "sobrenome", required = false) String sobrenome,
+                                                                    @RequestParam(value = "cpf", required = false) String cpf) {
+        Page<DentistaModelDTO> page = dentistaService.buscarCustomizado(pageable, id, nome, sobrenome, cpf);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    //    http://localhost:8080/dentistas/matriculas?matricula=153246
     @GetMapping("/matriculas")
-    @ResponseStatus(HttpStatus.OK)
-    public DentistaModelDTO buscarPorMatricula(@RequestParam(value = "matricula") String numMatricula) {
-        return dentistaService.buscarPorMatricula(numMatricula);
+    public ResponseEntity<DentistaModelDTO> buscarPorMatricula(@RequestParam(value = "matricula") String numMatricula) {
+        DentistaModelDTO dentista = dentistaService.buscarPorMatricula(numMatricula);
+        return ResponseEntity.status(HttpStatus.OK).body(dentista);
     }
 
-    //    http://localhost:8080/dentistas?size=2&page=0&especialidades?especialidade=clinico
     @GetMapping("/especialidades")
-    @ResponseStatus(HttpStatus.OK)
-    public Page<DentistaSummaryDTO> buscarPorEspecialidades(
+    public ResponseEntity<Page<DentistaSummaryDTO>> buscarPorEspecialidade(
             Pageable pageable,
             @RequestParam(value = "especialidade") String nomeEspecialidade) {
         try {
             Especialidade stringParaEnumEspecialidade = Especialidade.valueOf(nomeEspecialidade.toUpperCase());
-            return dentistaService.buscarPorEspecialidades(pageable, stringParaEnumEspecialidade);
+            Page<DentistaSummaryDTO> page = dentistaService.buscarPorEspecialidade(pageable,
+                    stringParaEnumEspecialidade);
+            return ResponseEntity.status(HttpStatus.OK).body(page);
         } catch (RuntimeException e) {
             throw new RuntimeException("Nenhum Dentista registrado possuí a especialidade informada.");
         }
     }
 
-    //    http://localhost:8080/dentistas?size=quantidade&page=numPágs
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Page<DentistaSummaryDTO> buscarTodos(Pageable pageable) {
-        return dentistaService.buscarTodos(pageable);
+    public ResponseEntity<Page<DentistaSummaryDTO>> buscarTodos(Pageable pageable) {
+        Page<DentistaSummaryDTO> page = dentistaService.buscarTodos(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
+    public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
         dentistaService.excluirPorId(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
     @Transactional
-//colocar isso em todos os métodos de excluir, salvar e atualizar (esse comentário = última modificação)
-    @ResponseStatus(HttpStatus.OK)//mudar para esse httpStatus os outros métodos de delete, save, update
-    public void atualizar(
+    public ResponseEntity<?> atualizar(
             @PathVariable("id") Long id,
             @Valid @RequestBody DentistaModelDTO dentistaDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
-        try {
-            dentistaService.atualizar(id, dentistaDTO);
-        } catch (ResponseStatusException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Dentista não encontrado.");
-        }
+        dentistaService.atualizar(id, dentistaDTO);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

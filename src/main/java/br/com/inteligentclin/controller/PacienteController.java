@@ -25,52 +25,51 @@ public class PacienteController {
 
     @PostMapping
     @Transactional
-//    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<PacienteModelDTO> salvar(@Valid @RequestBody PacienteModelDTO pacienteDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteService.salvar(pacienteDTO));
+        PacienteModelDTO pacienteSalvo = pacienteService.salvar(pacienteDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteSalvo);
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public PacienteModelDTO buscarPorId(@PathVariable("id") Long id) {
-        return pacienteService.buscarPorId(id).get();
+    public ResponseEntity<PacienteModelDTO> buscarPorId(@PathVariable("id") Long id) {
+        PacienteModelDTO paciente = pacienteService.buscarPorId(id).get();
+        return ResponseEntity.status(HttpStatus.OK).body(paciente);
     }
 
     @GetMapping("/custom")
-    @ResponseStatus(HttpStatus.OK)
-    public Page<PacienteModelDTO> buscarCustomizado(Pageable pageable,
-                                                    @RequestParam(value = "id", required = false) Long id,
-                                                    @RequestParam(value = "nome", required = false) String nome,
-                                                    @RequestParam(value = "sobrenome", required = false) String sobrenome,
-                                                    @RequestParam(value = "cpf", required = false) String cpf) {
-        return pacienteService.buscarCustomizado(pageable, id, nome, sobrenome, cpf);
+    public ResponseEntity<Page<PacienteModelDTO>> buscarCustomizado(Pageable pageable,
+                                                                    @RequestParam(value = "id", required = false) Long id,
+                                                                    @RequestParam(value = "nome", required = false) String nome,
+                                                                    @RequestParam(value = "sobrenome", required = false) String sobrenome,
+                                                                    @RequestParam(value = "cpf", required = false) String cpf) {
+        Page<PacienteModelDTO> page = pacienteService.buscarCustomizado(pageable, id, nome, sobrenome, cpf);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Page<PacienteSummaryDTO> buscarTodos(Pageable pageable) {
-        return pacienteService.buscarTodos(pageable);
+    public ResponseEntity<Page<PacienteSummaryDTO>> buscarTodos(Pageable pageable) {
+        Page<PacienteSummaryDTO> page = pacienteService.buscarTodos(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
+    public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
         pacienteService.excluirPorId(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
     @Transactional
-    @ResponseStatus(HttpStatus.OK)
-    public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody PacienteModelDTO pacienteDTO,
-                          BindingResult bgresult) {
+    public ResponseEntity<?> atualizar(@PathVariable("id") Long id, @Valid @RequestBody PacienteModelDTO pacienteDTO,
+                                       BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
         pacienteService.atualizar(id, pacienteDTO);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

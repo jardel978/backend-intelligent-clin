@@ -42,7 +42,7 @@ public class FileService {
             arquivoDaBase.setNome(file.getOriginalFilename());
             arquivoDaBase.setData(file.getBytes());
             arquivoDaBase.setTipo(file.getContentType());
-            return fileRepository.save(arquivoDaBase);
+            return fileRepository.saveAndFlush(arquivoDaBase);
         } catch (IOException e) {
             e.printStackTrace();
         }

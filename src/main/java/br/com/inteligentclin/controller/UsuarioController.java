@@ -32,11 +32,11 @@ public class UsuarioController {
 
     @PostMapping
     @Transactional
-    @ResponseStatus(HttpStatus.CREATED)
-    public UsuarioModelDTO salvar(@Valid @RequestBody UsuarioModelDTO usuarioDTO, BindingResult bgresult) throws DadoExistenteException {
+    public ResponseEntity<UsuarioModelDTO> salvar(@Valid @RequestBody UsuarioModelDTO usuarioDTO, BindingResult bgresult) throws DadoExistenteException {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
-        return usuarioService.salvar(usuarioDTO);
+        UsuarioModelDTO usuarioSalvo = usuarioService.salvar(usuarioDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioSalvo);
     }
 
     @GetMapping("/validarSenha")
@@ -51,55 +51,55 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public UsuarioModelDTO buscarPorId(@PathVariable("id") Long id) {
-        return usuarioService.buscarPorId(id).get();
+    public ResponseEntity<UsuarioModelDTO> buscarPorId(@PathVariable("id") Long id) {
+        UsuarioModelDTO usuarioSalvo = usuarioService.buscarPorId(id).get();
+        return ResponseEntity.status(HttpStatus.OK).body(usuarioSalvo);
     }
 
     @GetMapping("/custom")
-    @ResponseStatus(HttpStatus.OK)
-    public Page<UsuarioModelDTO> buscarCustomizado(Pageable pageable,
-                                                   @RequestParam(value = "id", required = false) Long id,
-                                                   @RequestParam(value = "nome", required = false) String nome,
-                                                   @RequestParam(value = "sobrenome", required = false) String sobrenome,
-                                                   @RequestParam(value = "cpf", required = false) String cpf) {
-        return usuarioService.buscarCustomizado(pageable, id, nome, sobrenome, cpf);
+    public ResponseEntity<Page<UsuarioModelDTO>> buscarCustomizado(Pageable pageable,
+                                                                   @RequestParam(value = "id", required = false) Long id,
+                                                                   @RequestParam(value = "nome", required = false) String nome,
+                                                                   @RequestParam(value = "sobrenome", required = false) String sobrenome,
+                                                                   @RequestParam(value = "cpf", required = false) String cpf) {
+        Page<UsuarioModelDTO> page = usuarioService.buscarCustomizado(pageable, id, nome, sobrenome, cpf);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @GetMapping("/email")
-    @ResponseStatus(HttpStatus.OK)
-    public List<UsuarioModelDTO> buscarPorEmail(@RequestParam(value = "email") String email) {
-        return usuarioService.buscarPorEmail(email);
+    public ResponseEntity<List<UsuarioModelDTO>> buscarPorEmail(@RequestParam(value = "email") String email) {
+        List<UsuarioModelDTO> lista = usuarioService.buscarPorEmail(email);
+        return ResponseEntity.status(HttpStatus.OK).body(lista);
     }
 
     @GetMapping("/cargos")
-    @ResponseStatus(HttpStatus.OK)
-    List<UsuarioModelDTO> buscarProCargo(@RequestParam(value = "cargo") String cargo) {
-        return usuarioService.buscarPorCargo(cargo);
+    public ResponseEntity<List<UsuarioModelDTO>> buscarProCargo(@RequestParam(value = "cargo") String cargo) {
+        List<UsuarioModelDTO> lista = usuarioService.buscarPorCargo(cargo);
+        return ResponseEntity.status(HttpStatus.OK).body(lista);
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Page<UsuarioSummaryDTO> buscarTodos(Pageable pageable) {
-        return usuarioService.buscarTodos(pageable);
+    public ResponseEntity<Page<UsuarioSummaryDTO>> buscarTodos(Pageable pageable) {
+        Page<UsuarioSummaryDTO> page = usuarioService.buscarTodos(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
+    public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
         usuarioService.excluirPorId(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
     @Transactional
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void atualizar(@PathVariable("id") Long id, @Valid @RequestBody UsuarioModelDTO usuarioDTO,
-                          BindingResult bgresult) {
+    public ResponseEntity<?> atualizar(@PathVariable("id") Long id, @Valid @RequestBody UsuarioModelDTO usuarioDTO,
+                                       BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
 
         usuarioService.atualizar(id, usuarioDTO);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

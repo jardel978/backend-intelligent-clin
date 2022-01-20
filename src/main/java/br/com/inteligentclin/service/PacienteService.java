@@ -49,10 +49,9 @@ public class PacienteService {
             paciente.setEndereco(enderecoExite);
 
         enderecoRepository.save(paciente.getEndereco());
-        pacienteRepository.save(paciente);
-
-        paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
-        return pacienteConverter.mapEntityToModelDTO(paciente, PacienteModelDTO.class);
+        Paciente pacienteSalvo = pacienteRepository.saveAndFlush(paciente);
+        pacienteSalvo.setIdade(utilDate.gerarIdade(pacienteSalvo.getDataNascimento(), LocalDate.now()));
+        return pacienteConverter.mapEntityToModelDTO(pacienteSalvo, PacienteModelDTO.class);
     }
 
     public Optional<PacienteModelDTO> buscarPorId(Long id) {
@@ -117,14 +116,12 @@ public class PacienteService {
 
         pacienteDaBase.setNome(pacienteDTO.getNome());
         pacienteDaBase.setSobrenome(pacienteDTO.getSobrenome());
-//        pacienteDaBase.setDataCadastro(pacienteDTO.getDataCadastro());
         pacienteDaBase.setCpf(pacienteDTO.getCpf());
         pacienteDaBase.setEmail(pacienteDTO.getEmail());
         pacienteDaBase.setTelefone(pacienteDTO.getTelefone());
         pacienteDaBase.setDataNascimento(pacienteDTO.getDataNascimento());
         pacienteDaBase.setEndereco(pacienteDTO.getEndereco());
         pacienteDaBase.setConsultas(pacienteDTO.getConsultas());
-//        pacienteDaBase.setProntuario(pacienteDTO.getProntuario());
         pacienteDaBase.setSexo(pacienteDTO.getSexo());
         salvar(pacienteDaBase);
     }

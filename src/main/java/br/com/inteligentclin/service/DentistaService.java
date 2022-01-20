@@ -32,9 +32,8 @@ public class DentistaService {
 
     public DentistaModelDTO salvar(DentistaModelDTO dentistaDTO) {
         Dentista dentista = dentistaConverter.mapModelDTOToEntity(dentistaDTO, Dentista.class);
-        dentistaRepository.save(dentista);
-
-        return dentistaDTO;
+        Dentista dentistaSalvo = dentistaRepository.saveAndFlush(dentista);
+        return dentistaConverter.mapEntityToModelDTO(dentistaSalvo, DentistaModelDTO.class);
     }
 
     public Optional<DentistaModelDTO> buscarPorId(Long id) {
@@ -65,7 +64,7 @@ public class DentistaService {
         return dentistaConverter.mapEntityToModelDTO(dentista, DentistaModelDTO.class);
     }
 
-    public Page<DentistaSummaryDTO> buscarPorEspecialidades(Pageable pageable, Especialidade nomeEspecialidade) {
+    public Page<DentistaSummaryDTO> buscarPorEspecialidade(Pageable pageable, Especialidade nomeEspecialidade) {
         Page<Dentista> dentistasPage = dentistaRepository.findByEspecialidadesContains(pageable, nomeEspecialidade);
         return dentistasPage.map(dentista -> dentistaConverter.mapEntityToSummaryDTO(dentista, DentistaSummaryDTO.class));
     }
