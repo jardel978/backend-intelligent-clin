@@ -4,6 +4,7 @@ import br.com.inteligentclin.dtos.PessoaModelDTO;
 import br.com.inteligentclin.dtos.consultaDTO.ConsultaSummaryDTO;
 import br.com.inteligentclin.entity.enums.Cargo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -25,6 +26,7 @@ public class UsuarioModelDTO extends PessoaModelDTO implements Serializable {
     private String login;
 
     @Size(min = 6, max = 15, message = "Sua senha deve ter no mínimo 6 dígitos.")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)//ignorar senha no retorno
     private String senha;
 
     //    @JsonManagedReference
