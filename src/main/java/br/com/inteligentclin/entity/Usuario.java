@@ -2,13 +2,12 @@ package br.com.inteligentclin.entity;
 
 import br.com.inteligentclin.entity.enums.Cargo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,6 +32,7 @@ public class Usuario extends Pessoa implements Serializable {
     @Column(unique = true)
     private String login;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)//ignorar senha no retorno
     private String senha;
 
     //    @JsonManagedReference

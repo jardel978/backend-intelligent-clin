@@ -1,7 +1,7 @@
 package br.com.inteligentclin.dtos.pacienteDTO;
 
 import br.com.inteligentclin.dtos.PessoaModelDTO;
-import br.com.inteligentclin.entity.Consulta;
+import br.com.inteligentclin.dtos.consultaDTO.ConsultaMixPacienteModelDTO;
 import br.com.inteligentclin.entity.Endereco;
 import br.com.inteligentclin.entity.Idade;
 import br.com.inteligentclin.entity.Prontuario;
@@ -29,7 +29,7 @@ public class PacienteModelDTO extends PessoaModelDTO implements Serializable {
 
     private Endereco endereco;
 
-    private Set<Consulta> consultas;
+    private Set<ConsultaMixPacienteModelDTO> consultas;
 
     private Prontuario prontuario;
 
