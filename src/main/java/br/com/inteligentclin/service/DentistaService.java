@@ -66,12 +66,22 @@ public class DentistaService {
 
     public Page<DentistaSummaryDTO> buscarPorEspecialidade(Pageable pageable, Especialidade nomeEspecialidade) {
         Page<Dentista> dentistasPage = dentistaRepository.findByEspecialidadesContains(pageable, nomeEspecialidade);
-        return dentistasPage.map(dentista -> dentistaConverter.mapEntityToSummaryDTO(dentista, DentistaSummaryDTO.class));
+        return dentistasPage.map(dentista -> {
+            DentistaSummaryDTO dentistaDTO = dentistaConverter.mapEntityToSummaryDTO(dentista,
+                    DentistaSummaryDTO.class);
+            dentistaDTO.setTemConsultas(verirficarSeDentistaTemConsultas(dentista));
+            return dentistaDTO;
+        });
     }
 
     public Page<DentistaSummaryDTO> buscarTodos(Pageable pageable) {
         Page<Dentista> dentistasPage = dentistaRepository.findAll(pageable);
-        return dentistasPage.map(dentista -> dentistaConverter.mapEntityToSummaryDTO(dentista, DentistaSummaryDTO.class));
+        return dentistasPage.map(dentista -> {
+            DentistaSummaryDTO dentistaDTO = dentistaConverter.mapEntityToSummaryDTO(dentista,
+                    DentistaSummaryDTO.class);
+            dentistaDTO.setTemConsultas(verirficarSeDentistaTemConsultas(dentista));
+            return dentistaDTO;
+        });
     }
 
     public void excluirPorId(Long id) throws EntidadeRelacionadaException {
@@ -107,5 +117,9 @@ public class DentistaService {
         dentistaDaBase.setConsultas(dentistaDTO.getConsultas());
         dentistaDaBase.setProntuarios(dentistaDTO.getProntuarios());
         salvar(dentistaDaBase);
+    }
+
+    public Boolean verirficarSeDentistaTemConsultas(Dentista dentista) {
+        return !dentista.getConsultas().isEmpty();
     }
 }

@@ -13,7 +13,7 @@ import java.time.LocalTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConsultaMixPacienteModelDTO implements Serializable {
+public class ConsultaMixClasseModelDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
