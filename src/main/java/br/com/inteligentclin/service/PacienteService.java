@@ -82,7 +82,10 @@ public class PacienteService {
 
         return lista.map(paciente -> {
             paciente.setIdade(utilDate.gerarIdade(paciente.getDataNascimento(), LocalDate.now()));
-            return pacienteConverter.mapEntityToSummaryDTO(paciente, PacienteSummaryDTO.class);
+            PacienteSummaryDTO pacienteDTO = pacienteConverter.mapEntityToSummaryDTO(paciente,
+                    PacienteSummaryDTO.class);
+            pacienteDTO.setTemConsultas(verificarSePacienteTemConsultas(paciente));
+            return pacienteDTO;
         });
     }
 
@@ -132,5 +135,9 @@ public class PacienteService {
                 endereco.getNumero(),
                 endereco.getBairro()
         );
+    }
+
+    public Boolean verificarSePacienteTemConsultas(Paciente paciente) {
+        return !paciente.getConsultas().isEmpty();
     }
 }
