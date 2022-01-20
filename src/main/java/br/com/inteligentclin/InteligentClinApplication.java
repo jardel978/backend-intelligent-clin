@@ -14,10 +14,4 @@ public class InteligentClinApplication {
         SpringApplication.run(InteligentClinApplication.class, args);
     }
 
-    @Bean
-    public PasswordEncoder getPasswordEncoder() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder;
-    }
-
 }
