@@ -130,7 +130,7 @@ public class PacienteService {
     }
 
     public Endereco verificarEnderecoExistente(Endereco endereco) {
-        return enderecoRepository.findByRuaAndNumeroAndBairro(
+        return enderecoRepository.findByRuaAndNumeroAndBairroIgnoreCase(
                 endereco.getRua(),
                 endereco.getNumero(),
                 endereco.getBairro()

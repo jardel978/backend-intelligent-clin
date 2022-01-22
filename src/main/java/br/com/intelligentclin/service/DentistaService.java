@@ -57,7 +57,7 @@ public class DentistaService {
     }
 
     public DentistaModelDTO buscarPorMatricula(String numMatricula) {
-        Dentista dentista = dentistaRepository.findByMatriculaContains(numMatricula).orElseThrow(() ->
+        Dentista dentista = dentistaRepository.findByMatriculaIgnoreCaseContains(numMatricula).orElseThrow(() ->
                 new DadoInexistenteException("Não localizamos um Dentista com a série de matrícula informada.")
         );
 

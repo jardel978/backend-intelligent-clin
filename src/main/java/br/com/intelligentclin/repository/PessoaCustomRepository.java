@@ -27,17 +27,18 @@ public class PessoaCustomRepository<T> {
         }
 
         if (nome != null) {
-            query += condicao + " T.nome = :nome";
+//            query += condicao + " T.nome ~* :nome";
+            query += condicao + " UPPER(T.nome) like UPPER(:nome)";
             condicao = " and";
         }
 
         if (sobrenome != null) {
-            query += condicao + " T.sobrenome = :sobrenome";
+            query += condicao + " UPPER(T.sobrenome) like UPPER(:sobrenome)";
             condicao = " and";
         }
 
         if (cpf != null) {
-            query += condicao + " T.cpf = :cpf";
+            query += condicao + " T.cpf like :cpf";
         }
 
         var qry = entityManager.createQuery(query);

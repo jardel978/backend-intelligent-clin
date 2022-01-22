@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface IDentistaRepository extends IPessoaBaseRepository<Dentista>, JpaRepository<Dentista, Long> {
 
-    Optional<Dentista> findByMatriculaContains(String matricula);
+    Optional<Dentista> findByMatriculaIgnoreCaseContains(String matricula);
 
     Page<Dentista> findByEspecialidadesContains(Pageable pageable, Especialidade especialidade);
 
