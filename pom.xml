@@ -8,11 +8,11 @@
 		<version>2.6.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.clinicasorridente</groupId>
-	<artifactId>pifinalbackend</artifactId>
+	<groupId>com.intelligentclin</groupId>
+	<artifactId>intelligentclin</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>JardelSilvaT3PIFinalBackendI</name>
-	<description>Projeto integrador de BackendI - CTD</description>
+	<name>IntelligentClinApplication</name>
+	<description>Projeto de um sistema para gerenciamento de clínicas</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
