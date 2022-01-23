@@ -14,8 +14,6 @@ public interface IUsuarioRepository extends IPessoaBaseRepository<Usuario>, JpaR
 
     List<Usuario> findByCargo(Cargo cargo);
 
-    Optional<Usuario> findByLogin(String login);
-
     Optional<Usuario> findByEmail(String email);
 
 }

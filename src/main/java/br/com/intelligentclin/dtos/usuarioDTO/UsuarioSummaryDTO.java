@@ -17,7 +17,7 @@ public class UsuarioSummaryDTO extends PessoaSummaryDTO implements Serializable 
 
     private String email;
 
-    private String login;
+//    private String login;
 
     private Cargo cargo;
 

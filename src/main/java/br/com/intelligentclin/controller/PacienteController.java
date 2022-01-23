@@ -54,15 +54,15 @@ public class PacienteController {
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    @DeleteMapping("/{id}")
     @Transactional
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
         pacienteService.excluirPorId(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{id}")
     @Transactional
+    @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable("id") Long id, @Valid @RequestBody PacienteModelDTO pacienteDTO,
                                        BindingResult bgresult) {
         if (bgresult.hasErrors())

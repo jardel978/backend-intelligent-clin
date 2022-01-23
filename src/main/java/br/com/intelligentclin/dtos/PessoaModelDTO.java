@@ -32,6 +32,7 @@ public class PessoaModelDTO {
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime dataCadastro;
 
+    @NotNull(message = "Por gentileza, informe um endereço de email.")
     @Pattern(regexp = "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", message =
             "Formato de email inválido. Exemplo: meuemail@gmail.com")
     private String email;

@@ -29,13 +29,9 @@ public class Usuario extends Pessoa implements Serializable {
     @GeneratedValue(generator = "usuario", strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(unique = true)
-    private String login;
-
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)//ignorar senha no retorno
     private String senha;
 
-    //    @JsonManagedReference
     @JsonIgnore
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)

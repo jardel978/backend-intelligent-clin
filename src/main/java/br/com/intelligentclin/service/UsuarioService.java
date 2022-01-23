@@ -7,20 +7,34 @@ import br.com.intelligentclin.entity.Usuario;
 import br.com.intelligentclin.entity.enums.Cargo;
 import br.com.intelligentclin.repository.IUsuarioRepository;
 import br.com.intelligentclin.repository.PessoaCustomRepository;
-import br.com.intelligentclin.service.exception.DadoExistenteException;
+import br.com.intelligentclin.security.JWTFilterAutenticacao;
+import br.com.intelligentclin.security.data.UsuarioDetailsData;
 import br.com.intelligentclin.service.exception.DadoInexistenteException;
 import br.com.intelligentclin.service.exception.EntidadeRelacionadaException;
 import br.com.intelligentclin.service.exception.ParametroRequeridoException;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static br.com.intelligentclin.security.JWTFilterAutenticacao.APLICATION_JSON_VALUE;
+import static br.com.intelligentclin.security.JWTFilterAutenticacao.TOKEN_EXPIRE_AT;
+import static br.com.intelligentclin.security.JWTFilterValidacao.ATRIBUTO_PREFIXO;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Service
 public class UsuarioService {
@@ -37,31 +51,11 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UsuarioModelDTO salvar(UsuarioModelDTO usuarioDTO) throws DadoExistenteException {
-        Optional<Usuario> usuarioBase = usuarioRepository.findByLogin(usuarioDTO.getLogin());
-        if (usuarioBase.isPresent())
-            throw new DadoExistenteException("O login: " + usuarioBase.get().getLogin() + " já existe. Tente outro " +
-                    "diferente.");
+    public UsuarioModelDTO salvar(UsuarioModelDTO usuarioDTO) {
         Usuario usuario = usuarioConverter.mapModelDTOToEntity(usuarioDTO, Usuario.class);
         usuario.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
         Usuario usuarioSalvo = usuarioRepository.saveAndFlush(usuario);
         return usuarioConverter.mapEntityToModelDTO(usuarioSalvo, UsuarioModelDTO.class);
-    }
-
-    public Boolean validarSenha(String login, String email, String senha) throws ParametroRequeridoException {
-        Optional<Usuario> usuario = null;
-        if (login == null && email == null || senha == null)
-            throw new ParametroRequeridoException("É necessário informar um login ou endereço de email e uma senha " +
-                    "para validar o usuário.");
-        if ((login != null && email == null) || (login != null && email != null))
-            usuario = usuarioRepository.findByLogin(login);
-        if (login == null && email != null)
-            usuario = usuarioRepository.findByEmail(email);
-
-        if (usuario.isEmpty())
-            return false;
-
-        return passwordEncoder.matches(senha, usuario.get().getSenha());
     }
 
     public Page<UsuarioModelDTO> buscarCustomizado(Pageable pageable,
@@ -111,8 +105,8 @@ public class UsuarioService {
                 "O usuário informado não foi localizado na base de dados."));
         boolean temConsulta = !usuario.getConsultas().isEmpty();
         if (temConsulta)
-            throw new EntidadeRelacionadaException("Não é possível excluir o usuário de login: " + usuario.getLogin() +
-                    " pois está vinculado a uma ou mais consultas.");
+            throw new EntidadeRelacionadaException("Não é possível excluir o usuário: " + usuario.getNome() + " " +
+                    usuario.getSobrenome() + " pois está vinculado a uma ou mais consultas.");
         usuarioRepository.deleteById(id);
     }
 
@@ -131,4 +125,53 @@ public class UsuarioService {
         usuarioRepository.save(usuarioDaBase);
     }
 
+    public Boolean validarSenha(String email, String senha) throws ParametroRequeridoException {
+        Optional<Usuario> usuario = null;
+        if (email == null || senha == null)
+            throw new ParametroRequeridoException("É necessário informar um endereço de email e uma senha " +
+                    "para validar o usuário.");
+
+        usuario = usuarioRepository.findByEmail(email);
+        if (usuario.isEmpty())
+            return false;
+
+        return passwordEncoder.matches(senha, usuario.get().getSenha());
+    }
+
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        if (authorizationHeader != null && authorizationHeader.startsWith(ATRIBUTO_PREFIXO)) {
+            try {
+                String refresh_token = authorizationHeader.substring(ATRIBUTO_PREFIXO.length());
+                Algorithm algorithm = Algorithm.HMAC256(JWTFilterAutenticacao.TOKEN_SENHA);
+                JWTVerifier jwtVerifier = JWT.require(algorithm).build();
+                DecodedJWT decodedJWT = jwtVerifier.verify(refresh_token);
+                String usuarioEmail = decodedJWT.getSubject();
+                Optional<Usuario> usuario = usuarioRepository.findByEmail(usuarioEmail);
+                UsuarioDetailsData usuarioDetailsData = new UsuarioDetailsData(usuario);
+                String access_token = JWT.create()
+                        .withSubject(usuarioDetailsData.getUsername())
+                        .withExpiresAt(new Date(System.currentTimeMillis() + TOKEN_EXPIRE_AT))
+                        .withIssuer(request.getRequestURL().toString())
+                        .withClaim("permissions", usuarioDetailsData.getAuthorities()
+                                .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())
+                        )
+                        .sign(algorithm);
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("access_token", access_token);
+                tokens.put("refresh_token", refresh_token);
+                response.setContentType(APLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+            } catch (Exception e) {
+                response.setHeader("error", e.getMessage());
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                //response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                Map<String, String> error = new HashMap<>();
+                error.put("error_message", e.getMessage());
+                response.setContentType(APLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), error);
+            }
+        } else
+            throw new RuntimeException("É necessário informar um Refresh token para solicitar a atualização do token.");
+    }
 }

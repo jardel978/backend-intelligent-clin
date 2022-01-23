@@ -1,8 +1,12 @@
 package br.com.intelligentclin.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -25,6 +29,7 @@ public class Pessoa implements Serializable {
     @Column(name = "data_cadastro")
     private LocalDateTime dataCadastro = LocalDateTime.now();
 
+    @Column(unique = true)
     private String email;
 
     private String telefone;

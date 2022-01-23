@@ -16,8 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -37,17 +40,6 @@ public class UsuarioController {
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
         UsuarioModelDTO usuarioSalvo = usuarioService.salvar(usuarioDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioSalvo);
-    }
-
-    @GetMapping("/validarSenha")
-    public ResponseEntity<Boolean> validarSenha(@RequestParam(value = "login", required = false) String login,
-                                                @RequestParam(value = "email", required = false) String email,
-                                                @RequestParam(value = "senha", required = false) String senha) throws ParametroRequeridoException {
-        boolean valido = usuarioService.validarSenha(login, email, senha);
-        if (valido)
-            return ResponseEntity.status(HttpStatus.OK).body(true);
-        else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
     }
 
     @GetMapping("/{id}")
@@ -100,6 +92,22 @@ public class UsuarioController {
 
         usuarioService.atualizar(id, usuarioDTO);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/validarSenha")
+    public ResponseEntity<Boolean> validarSenha(@RequestParam(value = "email") String email,
+                                                @RequestParam(value = "senha") String senha) throws ParametroRequeridoException {
+        boolean valido = usuarioService.validarSenha(email, senha);
+        if (valido)
+            return ResponseEntity.status(HttpStatus.OK).body(true);
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+    }
+
+    @GetMapping("/token/refresh")
+    public void refreshToken(HttpServletRequest request,
+                             HttpServletResponse response) throws ParametroRequeridoException, IOException {
+        usuarioService.refreshToken(request, response);
     }
 
 }
