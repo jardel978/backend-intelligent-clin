@@ -35,7 +35,7 @@ public class UsuarioController {
 
     @PostMapping("/cadastrar")
     @Transactional
-    public ResponseEntity<UsuarioModelDTO> salvar(@Valid @RequestBody UsuarioModelDTO usuarioDTO, BindingResult bgresult) throws DadoExistenteException {
+    public ResponseEntity<UsuarioModelDTO> salvar(@Valid @RequestBody UsuarioModelDTO usuarioDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
         UsuarioModelDTO usuarioSalvo = usuarioService.salvar(usuarioDTO);
