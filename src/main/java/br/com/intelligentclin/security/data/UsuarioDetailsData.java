@@ -29,17 +29,24 @@ public class UsuarioDetailsData implements UserDetails {
         SimpleGrantedAuthority user2 = new SimpleGrantedAuthority("ROLE_USER2");
         SimpleGrantedAuthority user3 = new SimpleGrantedAuthority("ROLE_USER3");
         if (usuario.isPresent()) {
-            if (usuario.get().getCargo() == Cargo.DIRETOR)
+            if (usuario.get().getCargo() == Cargo.DIRETOR) {
                 authorityUser.add(admin);
-
-            if (usuario.get().getCargo() == Cargo.GERENTE)
                 authorityUser.add(user1);
-
-            if (usuario.get().getCargo() == Cargo.ATENDENTE)
                 authorityUser.add(user2);
-
-            if (usuario.get().getCargo() == Cargo.ESTAGIARIO)
                 authorityUser.add(user3);
+            }
+            if (usuario.get().getCargo() == Cargo.GERENTE) {
+                authorityUser.add(user1);
+                authorityUser.add(user2);
+                authorityUser.add(user3);
+            }
+            if (usuario.get().getCargo() == Cargo.ATENDENTE) {
+                authorityUser.add(user2);
+                authorityUser.add(user3);
+            }
+            if (usuario.get().getCargo() == Cargo.ESTAGIARIO) {
+                authorityUser.add(user3);
+            }
         }
         return authorityUser;
     }

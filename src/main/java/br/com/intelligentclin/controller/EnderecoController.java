@@ -20,34 +20,34 @@ public class EnderecoController {
     @Autowired
     private EnderecoService enderecoService;
 
-//    @PostMapping
 //    @Transactional
+//    @PostMapping("/permitAll/cadastrar")
 //    public ResponseEntity<EnderecoModelDTO> salvar(@RequestBody EnderecoModelDTO enderecoDTO) {
 //        EnderecoModelDTO enderecoSalvo = enderecoService.salvar(enderecoDTO);
 //        return ResponseEntity.status(HttpStatus.CREATED).body(enderecoSalvo);
 //    }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-id/{id}")
     public ResponseEntity<EnderecoModelDTO> buscarPorId(@PathVariable("id") Long id) {
         EnderecoModelDTO endereco = enderecoService.buscarPorId(id).get();
         return ResponseEntity.status(HttpStatus.OK).body(endereco);
     }
 
-    @GetMapping
+    @GetMapping("/permitAll/todos")
     public ResponseEntity<Page<EnderecoSummaryDTO>> buscarTodos(Pageable pageable) {
         Page<EnderecoSummaryDTO> page = enderecoService.buscarTodos(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    @DeleteMapping("/{id}")
     @Transactional
+    @DeleteMapping("/deletar/{id}")
     public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
         enderecoService.excluirPorId(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{id}")
     @Transactional
+    @PutMapping("/atualizar/{id}")
     public ResponseEntity<?> atualizar(@PathVariable("id") Long id, @RequestBody EnderecoModelDTO enderecoDTO) {
         enderecoService.atualizar(id, enderecoDTO);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

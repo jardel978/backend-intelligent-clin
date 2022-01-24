@@ -24,8 +24,8 @@ public class DentistaController {
     @Autowired
     private DentistaService dentistaService;
 
-    @PostMapping
     @Transactional
+    @PostMapping("/cadastrar")
     public ResponseEntity<DentistaModelDTO> salvar(@Valid @RequestBody DentistaModelDTO dentistaDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
@@ -34,13 +34,13 @@ public class DentistaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dentistaSalvo);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-id/{id}")
     public ResponseEntity<DentistaModelDTO> buscarPorId(@PathVariable("id") Long id) {
         DentistaModelDTO dentista = dentistaService.buscarPorId(id).get();
         return ResponseEntity.status(HttpStatus.OK).body(dentista);
     }
 
-    @GetMapping("/custom")
+    @GetMapping("/buscar-custom")
     public ResponseEntity<Page<DentistaModelDTO>> buscarCustomizado(Pageable pageable,
                                                                     @RequestParam(value = "id", required = false) Long id,
                                                                     @RequestParam(value = "nome", required = false) String nome,
@@ -50,13 +50,13 @@ public class DentistaController {
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    @GetMapping("/matriculas")
-    public ResponseEntity<DentistaModelDTO> buscarPorMatricula(@RequestParam(value = "matricula") String numMatricula) {
+    @GetMapping("/buscar-matricula/{matricula}")
+    public ResponseEntity<DentistaModelDTO> buscarPorMatricula(@PathVariable("matricula") String numMatricula) {
         DentistaModelDTO dentista = dentistaService.buscarPorMatricula(numMatricula);
         return ResponseEntity.status(HttpStatus.OK).body(dentista);
     }
 
-    @GetMapping("/especialidades")
+    @GetMapping("/permitAll/especialidades")
     public ResponseEntity<Page<DentistaSummaryDTO>> buscarPorEspecialidade(
             Pageable pageable,
             @RequestParam(value = "especialidade") String nomeEspecialidade) {
@@ -70,21 +70,21 @@ public class DentistaController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/permitAll/todos")
     public ResponseEntity<Page<DentistaSummaryDTO>> buscarTodos(Pageable pageable) {
         Page<DentistaSummaryDTO> page = dentistaService.buscarTodos(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    @DeleteMapping("/{id}")
     @Transactional
+    @DeleteMapping("/deletar/{id}")
     public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
         dentistaService.excluirPorId(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{id}")
     @Transactional
+    @PutMapping("/atualizar/{id}")
     public ResponseEntity<?> atualizar(
             @PathVariable("id") Long id,
             @Valid @RequestBody DentistaModelDTO dentistaDTO, BindingResult bgresult) {

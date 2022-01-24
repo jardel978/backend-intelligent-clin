@@ -29,11 +29,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class JWTFilterAutenticacao extends UsernamePasswordAuthenticationFilter {
 
-    //        public static final int TOKEN_EXPIRE_AT = 1000 * 60 * 60 * 24 * 7; //1 semana
-    public static final int TOKEN_EXPIRE_AT = 1000 * 30; //5 min
-    public static final int REFRESH_TOKEN_EXPIRE_AT = 1000 * 60 * 20; //20 min
-    public static final String TOKEN_SENHA = "ff163f2e-9757-4571-b2bd-a4801de92012";
+//    public static final int TOKEN_EXPIRE_AT = 1000 * 30; //30 s (teste)
+//    public static final int REFRESH_TOKEN_EXPIRE_AT = 1000 * 60 * 20; //20 min (teste)
+    public static final int TOKEN_EXPIRE_AT = 1000 * 60 * 60 * 24 * 7; //1 semana
+    public static final int REFRESH_TOKEN_EXPIRE_AT = 1000 * 60 * 60 * 24 * 30 * 3; //3 meses
     public static final String APLICATION_JSON_VALUE = "application/json";
+    public static final String TOKEN_SENHA = "ff163f2e-9757-4571-b2bd-a4801de92012";
 
 
     @Autowired

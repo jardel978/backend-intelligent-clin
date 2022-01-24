@@ -23,41 +23,41 @@ public class ConsultaController {
     @Autowired
     private ConsultaModelMapperConverter consultaConverter;
 
-    @PostMapping("/salvar")
     @Transactional
+    @PostMapping("/permitAll/cadastrar")
     public ResponseEntity<ConsultaModelDTO> salvar(@RequestBody ConsultaModelDTO consultaDTO,
-                                                   @RequestParam(value = "idPaciente") Long idPaciente,
-                                                   @RequestParam(value = "idDentista") Long idDentista,
-                                                   @RequestParam(value = "idUsuario") Long idUsuario) {
+                                                   @RequestParam(value = "id-paciente") Long idPaciente,
+                                                   @RequestParam(value = "id-dentista") Long idDentista,
+                                                   @RequestParam(value = "id-usuario") Long idUsuario) {
         ConsultaModelDTO consultaSalva = consultaService.salvar(consultaDTO, idPaciente, idDentista, idUsuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(consultaSalva);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-id/{id}")
     public ResponseEntity<ConsultaModelDTO> buscarPorId(@PathVariable("id") Long id) {
         ConsultaModelDTO consulta = consultaService.buscarPorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(consulta);
     }
 
-    @GetMapping
+    @GetMapping("/permitAll/todos")
     public Page<ConsultaSummaryDTO> buscarTodos(Pageable pageable) {
         return consultaService.buscarTodos(pageable);
     }
 
-    @DeleteMapping("/{id}")
     @Transactional
+    @DeleteMapping("/deletar/{id}")
     public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) {
         consultaService.excluirPorId(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Transactional
     @PutMapping("/atualizar")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<?> atualizar(@RequestParam("idConsulta") Long idConsulta,
+    public ResponseEntity<?> atualizar(@RequestParam("id-consulta") Long idConsulta,
                                        @RequestBody ConsultaModelDTO consultaDTO,
-                                       @RequestParam(value = "idPaciente") Long idPaciente,
-                                       @RequestParam(value = "idDentista") Long idDentista,
-                                       @RequestParam(value = "idUsuario") Long idUsuario) {
+                                       @RequestParam(value = "id-paciente") Long idPaciente,
+                                       @RequestParam(value = "id-dentista") Long idDentista,
+                                       @RequestParam(value = "id-usuario") Long idUsuario) {
         consultaService.atualizar(idConsulta, consultaDTO, idPaciente, idDentista, idUsuario);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -23,12 +23,12 @@ public class ProntuarioController {
     @Autowired
     private ProntuarioService prontuarioService;
 
-    @PostMapping("/salvar")
     @Transactional
+    @PostMapping("/permitAll/cadastrar")
     public ResponseEntity<ProntuarioModelDTO> salvar(
             @RequestBody ProntuarioModelDTO prontuarioDTO,
-            @Valid @RequestParam(value = "idPaciente") Long idPaciente,
-            @Valid @RequestParam(value = "idDentista") Long idDentista,
+            @Valid @RequestParam(value = "id-paciente") Long idPaciente,
+            @Valid @RequestParam(value = "id-dentista") Long idDentista,
             BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
@@ -37,20 +37,20 @@ public class ProntuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(prontuarioSalvo);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-id/{id}")
     public ResponseEntity<ProntuarioModelDTO> buscarPorId(@PathVariable("id") Long id) {
         ProntuarioModelDTO prontuario = prontuarioService.buscarPorId(id).get();
         return ResponseEntity.status(HttpStatus.OK).body(prontuario);
     }
 
-    @GetMapping
+    @GetMapping("/permitAll/todos")
     public ResponseEntity<Page<ProntuarioSummaryDTO>> buscarTodos(Pageable pageable) {
         Page<ProntuarioSummaryDTO> page = prontuarioService.buscarTodos(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    @DeleteMapping("/{id}")
     @Transactional
+    @DeleteMapping("/deletar/{id}")
     public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) throws ValidadeProntuarioException {
         prontuarioService.excluirPorId(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -59,8 +59,8 @@ public class ProntuarioController {
     @PutMapping("/atualizar")
     @Transactional
     public ResponseEntity<?> atualizar(@RequestBody ProntuarioModelDTO prontuarioDTO,
-                                       @Valid @RequestParam(value = "idPaciente") Long idPaciente,
-                                       @Valid @RequestParam(value = "idDentista") Long idDentista,
+                                       @Valid @RequestParam(value = "id-paciente") Long idPaciente,
+                                       @Valid @RequestParam(value = "id-dentista") Long idDentista,
                                        BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());

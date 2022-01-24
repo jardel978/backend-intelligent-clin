@@ -33,7 +33,7 @@ public class UsuarioController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @PostMapping
+    @PostMapping("/cadastrar")
     @Transactional
     public ResponseEntity<UsuarioModelDTO> salvar(@Valid @RequestBody UsuarioModelDTO usuarioDTO, BindingResult bgresult) throws DadoExistenteException {
         if (bgresult.hasErrors())
@@ -42,13 +42,13 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioSalvo);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-id/{id}")
     public ResponseEntity<UsuarioModelDTO> buscarPorId(@PathVariable("id") Long id) {
         UsuarioModelDTO usuarioSalvo = usuarioService.buscarPorId(id).get();
         return ResponseEntity.status(HttpStatus.OK).body(usuarioSalvo);
     }
 
-    @GetMapping("/custom")
+    @GetMapping("/buscar-custom")
     public ResponseEntity<Page<UsuarioModelDTO>> buscarCustomizado(Pageable pageable,
                                                                    @RequestParam(value = "id", required = false) Long id,
                                                                    @RequestParam(value = "nome", required = false) String nome,
@@ -58,32 +58,32 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    @GetMapping("/email")
+    @GetMapping("/buscar-email")
     public ResponseEntity<List<UsuarioModelDTO>> buscarPorEmail(@RequestParam(value = "email") String email) {
         List<UsuarioModelDTO> lista = usuarioService.buscarPorEmail(email);
         return ResponseEntity.status(HttpStatus.OK).body(lista);
     }
 
-    @GetMapping("/cargos")
+    @GetMapping("/buscar-cargos")
     public ResponseEntity<List<UsuarioModelDTO>> buscarProCargo(@RequestParam(value = "cargo") String cargo) {
         List<UsuarioModelDTO> lista = usuarioService.buscarPorCargo(cargo);
         return ResponseEntity.status(HttpStatus.OK).body(lista);
     }
 
-    @GetMapping
+    @GetMapping("/buscar-todos")
     public ResponseEntity<Page<UsuarioSummaryDTO>> buscarTodos(Pageable pageable) {
         Page<UsuarioSummaryDTO> page = usuarioService.buscarTodos(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deletar/{id}")
     @Transactional
     public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
         usuarioService.excluirPorId(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar/{id}")
     @Transactional
     public ResponseEntity<?> atualizar(@PathVariable("id") Long id, @Valid @RequestBody UsuarioModelDTO usuarioDTO,
                                        BindingResult bgresult) {
@@ -94,7 +94,7 @@ public class UsuarioController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/validarSenha")
+    @GetMapping("/validar-senha")
     public ResponseEntity<Boolean> validarSenha(@RequestParam(value = "email") String email,
                                                 @RequestParam(value = "senha") String senha) throws ParametroRequeridoException {
         boolean valido = usuarioService.validarSenha(email, senha);

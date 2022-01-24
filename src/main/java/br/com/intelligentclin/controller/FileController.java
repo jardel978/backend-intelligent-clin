@@ -20,22 +20,21 @@ public class FileController {
     @Autowired
     private FileService fileService;
 
-    @PostMapping("/{idProntuario}")
     @Transactional
-//    @PreAuthorize("hasRole('ROLE')")
+    @PostMapping("/permitAll/cadastrar/{idProntuario}")
     public ResponseEntity<File> salvar(@RequestBody MultipartFile file, @PathVariable("idProntuario") Long idProntuario) {
         File fileSalvo = fileService.salvar(file, idProntuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(fileSalvo);
     }
 
-    @GetMapping
+    @GetMapping("/permitAll/todos")
     public ResponseEntity<Page<File>> buscarTodos(Pageable pageable) {
         Page<File> page = fileService.buscarTodos(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    @PutMapping("/{id}")
     @Transactional
+    @PutMapping("/atualizar/{id}")
     public ResponseEntity<File> atualizar(@PathVariable("id") Long id, @RequestBody MultipartFile file) throws IOException {
         File fileAtualizado = fileService.atualizar(id, file);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(fileAtualizado);

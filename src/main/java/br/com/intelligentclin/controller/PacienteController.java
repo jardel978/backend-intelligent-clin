@@ -23,8 +23,8 @@ public class PacienteController {
     @Autowired
     private PacienteService pacienteService;
 
-    @PostMapping
     @Transactional
+    @PostMapping("/permitAll/cadastrar")
     public ResponseEntity<PacienteModelDTO> salvar(@Valid @RequestBody PacienteModelDTO pacienteDTO, BindingResult bgresult) {
         if (bgresult.hasErrors())
             throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
@@ -32,13 +32,13 @@ public class PacienteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pacienteSalvo);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-id/{id}")
     public ResponseEntity<PacienteModelDTO> buscarPorId(@PathVariable("id") Long id) {
         PacienteModelDTO paciente = pacienteService.buscarPorId(id).get();
         return ResponseEntity.status(HttpStatus.OK).body(paciente);
     }
 
-    @GetMapping("/custom")
+    @GetMapping("/buscar-custom")
     public ResponseEntity<Page<PacienteModelDTO>> buscarCustomizado(Pageable pageable,
                                                                     @RequestParam(value = "id", required = false) Long id,
                                                                     @RequestParam(value = "nome", required = false) String nome,
@@ -48,21 +48,21 @@ public class PacienteController {
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
-    @GetMapping
+    @GetMapping("/permitAll/todos")
     public ResponseEntity<Page<PacienteSummaryDTO>> buscarTodos(Pageable pageable) {
         Page<PacienteSummaryDTO> page = pacienteService.buscarTodos(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @Transactional
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deletar/{id}")
     public ResponseEntity<?> excluirPorId(@PathVariable("id") Long id) throws EntidadeRelacionadaException {
         pacienteService.excluirPorId(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Transactional
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar/{id}")
     public ResponseEntity<?> atualizar(@PathVariable("id") Long id, @Valid @RequestBody PacienteModelDTO pacienteDTO,
                                        BindingResult bgresult) {
         if (bgresult.hasErrors())

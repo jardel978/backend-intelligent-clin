@@ -18,8 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 
 @EnableWebSecurity
@@ -42,8 +41,49 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers("/login/**", "/usuarios/token/refresh/**").permitAll();
-        http.authorizeRequests().antMatchers(GET, "/usuarios/**").hasAnyAuthority("ROLE_USER1");
-        http.authorizeRequests().antMatchers(POST, "/usuarios/**").hasAnyAuthority("ROLE_ADMIN");
+        // permissões para solicitações tipo GET
+        http.authorizeRequests().antMatchers(//permitido a estagiário
+                GET, "/pacientes/permitAll/**", "/enderecos/permitAll/**", "/dentistas/permitAll/**", "/prontuarios/permitAll/**", "/consultas/permitAll/**",
+                "/files/permitAll/**"
+        ).hasAnyAuthority("ROLE_USER3");
+        http.authorizeRequests().antMatchers(//permitidos a diretor, gerente, atendente
+                GET, "/pacientes/**", "/enderecos/**", "/dentistas/**", "/prontuarios/**", "/consultas/**",
+                "/files/**"
+        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1", "ROLE_USER2");
+        http.authorizeRequests().antMatchers(//permitido a diretor e gerente
+                GET, "/usuarios/**"
+        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1");
+
+        // permissões para solicitações tipo POST
+        http.authorizeRequests().antMatchers(//permitidos a estagiário
+                POST, "/pacientes/permitAll/**", "/enderecos/permitAll/**", "/prontuarios/permitAll/**", "/consultas/permitAll/**",
+                "/files/permitAll/**"
+        ).hasAnyAuthority("ROLE_USER3");
+        http.authorizeRequests().antMatchers(//permitidos a diretor gerente e atendente
+                POST, "/pacientes/**", "/enderecos/**", "/prontuarios/**", "/consultas/**", "/files/**"
+        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1", "ROLE_USER2");
+        http.authorizeRequests().antMatchers(//permitidos a diretor e gerente
+                POST, "/dentistas/**", "/usuarios/**"
+        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1");
+
+        // permissões para solicitações tipo PUT
+        http.authorizeRequests().antMatchers(// permitidos a diretor gerente e atendente
+                PUT, "/pacientes/**", "/enderecos/**", "/prontuarios/**", "/consultas/**", "/files/**"
+        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1", "ROLE_USER2");
+        //estagiários não estão permitidos a autualizar registros
+        http.authorizeRequests().antMatchers(//permitidos a diretor e gerente
+                PUT, "/dentistas/**", "/usuarios/**"
+        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1");
+
+        // permissões para solicitações tipo DELETE
+        http.authorizeRequests().antMatchers(// permitidos a diretor gerente e atendente
+                DELETE, "/pacientes/**", "/enderecos/**", "/prontuarios/**", "/consultas/**", "/files/**"
+        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1", "ROLE_USER2");
+        //estagiários não estão permitidos a deletar registros
+        http.authorizeRequests().antMatchers(//permitidos a diretor e gerente
+                DELETE, "/dentistas/**", "/usuarios/**"
+        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1");
+
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(new JWTFilterAutenticacao(authenticationManagerBean()));
         http.addFilterBefore(new JWTFilterValidacao(), UsernamePasswordAuthenticationFilter.class);
