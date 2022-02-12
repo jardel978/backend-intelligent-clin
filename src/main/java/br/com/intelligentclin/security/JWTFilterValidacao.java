@@ -15,10 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static br.com.intelligentclin.security.JWTFilterAutenticacao.APLICATION_JSON_VALUE;
 import static java.util.Arrays.stream;
@@ -28,13 +25,13 @@ public class JWTFilterValidacao extends OncePerRequestFilter {
 
     public static final String ATRIBUTO_PREFIXO = "Bearer ";
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws IOException, ServletException {
         if (request.getServletPath().equals("/login")
-                || request.getServletPath().equals("/usuarios/token/refresh")) {
+                || request.getServletPath().equals("/usuarios/token/refresh")
+                || request.getServletPath().equals("/usuarios/me")) {
             filterChain.doFilter(request, response);
         } else {
             String authorizationHeader = request.getHeader(AUTHORIZATION);
@@ -56,34 +53,19 @@ public class JWTFilterValidacao extends OncePerRequestFilter {
                     response.setHeader("error", e.getMessage());
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     //response.sendError(HttpServletResponse.SC_FORBIDDEN);
-                    Map<String, String> error = new HashMap<>();
-                    error.put("error_message", e.getMessage());
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("exception", e.getMessage());
+                    if (e.getMessage().contains("Token has expired"))
+                        data.put("message", "token expirado");
+                    else
+                        data.put("message", "acesso negado");
+                    data.put("timestamp", new Date());
                     response.setContentType(APLICATION_JSON_VALUE);
-                    new ObjectMapper().writeValue(response.getOutputStream(), error);
+                    new ObjectMapper().writeValue(response.getOutputStream(), data);
                 }
             } else {
                 filterChain.doFilter(request, response);
             }
-
         }
     }
-
-//    public UsernamePasswordAuthenticationToken getAuthenticationToken(String token) {
-//        String usuarioLogin = JWT.require(Algorithm.HMAC256(JWTFilterAutenticacao.TOKEN_SENHA))
-//                .build()
-//                .verify(token)
-//                .getSubject();
-//        List<String> aud = JWT.require(Algorithm.HMAC256(JWTFilterAutenticacao.TOKEN_SENHA))
-//                .build()
-//                .verify(token)
-//                .getClaim("permissions").asList(String.class);
-//
-//        if (usuarioLogin == null)
-//            return null;
-////        List<GrantedAuthority> authorityUser = AuthorityUtils.createAuthorityList(aud);
-//        return new UsernamePasswordAuthenticationToken(
-//                usuarioLogin,
-//                null,
-//                null);
-//    }
 }

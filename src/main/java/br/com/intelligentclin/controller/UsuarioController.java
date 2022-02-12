@@ -4,7 +4,6 @@ import br.com.intelligentclin.controller.exception.ConstraintException;
 import br.com.intelligentclin.dtos.usuarioDTO.UsuarioModelDTO;
 import br.com.intelligentclin.dtos.usuarioDTO.UsuarioSummaryDTO;
 import br.com.intelligentclin.service.UsuarioService;
-import br.com.intelligentclin.service.exception.DadoExistenteException;
 import br.com.intelligentclin.service.exception.EntidadeRelacionadaException;
 import br.com.intelligentclin.service.exception.ParametroRequeridoException;
 import org.modelmapper.ModelMapper;
@@ -64,6 +63,13 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.OK).body(lista);
     }
 
+    @GetMapping("/permitAll/buscar-proprio-usuario")
+    public ResponseEntity<UsuarioModelDTO> buscarProprioUsuario(HttpServletRequest request,
+                                                                      HttpServletResponse response) throws IOException {
+        UsuarioModelDTO usuarioSalvo = usuarioService.buscarProprioUsuario(request, response);
+        return ResponseEntity.status(HttpStatus.OK).body(usuarioSalvo);
+    }
+
     @GetMapping("/buscar-cargos")
     public ResponseEntity<List<UsuarioModelDTO>> buscarProCargo(@RequestParam(value = "cargo") String cargo) {
         List<UsuarioModelDTO> lista = usuarioService.buscarPorCargo(cargo);
@@ -94,6 +100,19 @@ public class UsuarioController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PutMapping("/permitAll/atualizar")
+    public ResponseEntity<?> editarProprioUsuario(HttpServletRequest request,
+                                                  HttpServletResponse response,
+                                                  @Valid @RequestBody UsuarioModelDTO usuarioDTO, BindingResult bgresult) throws IOException {
+
+
+        if(bgresult.hasErrors())
+            throw new ConstraintException(bgresult.getAllErrors().get(0).getDefaultMessage());
+
+        usuarioService.editarProprioUsuario(request, response, usuarioDTO);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @GetMapping("/validar-senha")
     public ResponseEntity<Boolean> validarSenha(@RequestParam(value = "email") String email,
                                                 @RequestParam(value = "senha") String senha) throws ParametroRequeridoException {
@@ -108,6 +127,11 @@ public class UsuarioController {
     public void refreshToken(HttpServletRequest request,
                              HttpServletResponse response) throws ParametroRequeridoException, IOException {
         usuarioService.refreshToken(request, response);
+    }
+
+    @GetMapping("/me")
+    public void autenticarTokenExistente(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        usuarioService.autenticarTokenExistente(request, response);
     }
 
 }

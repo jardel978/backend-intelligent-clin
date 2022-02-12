@@ -80,4 +80,8 @@ public class UsuarioDetailsData implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public Optional<Usuario> getUsuario() {
+        return usuario;
+    }
 }

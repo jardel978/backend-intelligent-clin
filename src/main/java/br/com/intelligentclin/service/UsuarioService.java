@@ -76,6 +76,31 @@ public class UsuarioService {
         return usuarioConverter.convertListEntityToModelDTO(lista, UsuarioModelDTO.class);
     }
 
+
+    public UsuarioModelDTO buscarProprioUsuario(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        if (authorizationHeader != null && authorizationHeader.startsWith(ATRIBUTO_PREFIXO)) {
+
+            try {
+                String token = authorizationHeader.substring(ATRIBUTO_PREFIXO.length());
+                Usuario usuarioDaBase = buscarUsuarioViaToken(token).orElseThrow(() ->
+                        new DadoInexistenteException("Usuário não encontrado na base de dados.")
+                );
+                return usuarioConverter.mapEntityToModelDTO(usuarioDaBase, UsuarioModelDTO.class);
+            } catch (Exception e) {
+                response.setHeader("error", e.getMessage());
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                Map<String, String> data = new HashMap<>();
+                data.put("error_message", e.getMessage());
+                response.setContentType(APLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), data);
+            }
+        } else {
+            new RuntimeException("Token inexistente");
+        }
+        return null;
+    }
+
     public List<UsuarioModelDTO> buscarPorCargo(String cargo) {
         try {
             Cargo stringParaEnum = Cargo.valueOf(cargo.toUpperCase());
@@ -125,6 +150,41 @@ public class UsuarioService {
         usuarioRepository.save(usuarioDaBase);
     }
 
+    public void editarProprioUsuario(HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     UsuarioModelDTO usuarioDTO) throws IOException {
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        if (authorizationHeader != null && authorizationHeader.startsWith(ATRIBUTO_PREFIXO)) {
+
+            try {
+                String token = authorizationHeader.substring(ATRIBUTO_PREFIXO.length());
+                Usuario usuarioDaBase = buscarUsuarioViaToken(token).orElseThrow(() ->
+                        new DadoInexistenteException("Usuário não encontrado na base de dados.")
+                );
+
+                if (usuarioDaBase.getCargo() == Cargo.DIRETOR) {
+                    usuarioDaBase.setNome(usuarioDTO.getNome());
+                    usuarioDaBase.setSobrenome(usuarioDTO.getSobrenome());
+                    usuarioDaBase.setCpf(usuarioDTO.getCpf());
+                    usuarioDaBase.setCargo(usuarioDTO.getCargo());
+                }
+                usuarioDaBase.setEmail(usuarioDTO.getEmail());
+                usuarioDaBase.setTelefone(usuarioDTO.getTelefone());
+                usuarioDaBase.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
+                usuarioRepository.save(usuarioDaBase);
+            } catch (Exception e) {
+                response.setHeader("error", e.getMessage());
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                Map<String, String> data = new HashMap<>();
+                data.put("error_message", e.getMessage());
+                response.setContentType(APLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), data);
+            }
+        } else {
+            new RuntimeException("Token inexistente");
+        }
+    }
+
     public Boolean validarSenha(String email, String senha) throws ParametroRequeridoException {
         Optional<Usuario> usuario = null;
         if (email == null || senha == null)
@@ -143,11 +203,8 @@ public class UsuarioService {
         if (authorizationHeader != null && authorizationHeader.startsWith(ATRIBUTO_PREFIXO)) {
             try {
                 String refresh_token = authorizationHeader.substring(ATRIBUTO_PREFIXO.length());
-                Algorithm algorithm = Algorithm.HMAC256(JWTFilterAutenticacao.TOKEN_SENHA);
-                JWTVerifier jwtVerifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = jwtVerifier.verify(refresh_token);
-                String usuarioEmail = decodedJWT.getSubject();
-                Optional<Usuario> usuario = usuarioRepository.findByEmail(usuarioEmail);
+                System.out.println(refresh_token);
+                Optional<Usuario> usuario = buscarUsuarioViaToken(refresh_token);
                 UsuarioDetailsData usuarioDetailsData = new UsuarioDetailsData(usuario);
                 String access_token = JWT.create()
                         .withSubject(usuarioDetailsData.getUsername())
@@ -156,22 +213,61 @@ public class UsuarioService {
                         .withClaim("permissions", usuarioDetailsData.getAuthorities()
                                 .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())
                         )
-                        .sign(algorithm);
-                Map<String, String> tokens = new HashMap<>();
-                tokens.put("access_token", access_token);
-                tokens.put("refresh_token", refresh_token);
+                        .sign(Algorithm.HMAC256(JWTFilterAutenticacao.TOKEN_SENHA));
+                Map<String, Object> data = new HashMap<>();
+                data.put("token", access_token);
+                data.put("refreshToken", refresh_token);
+                data.put("permissions", usuarioDetailsData.getAuthorities()
+                        .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+                data.put("role", usuarioDetailsData.getUsuario().get().getCargo());
                 response.setContentType(APLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+                new ObjectMapper().writeValue(response.getOutputStream(), data);
             } catch (Exception e) {
                 response.setHeader("error", e.getMessage());
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 //response.sendError(HttpServletResponse.SC_FORBIDDEN);
-                Map<String, String> error = new HashMap<>();
-                error.put("error_message", e.getMessage());
+                Map<String, String> data = new HashMap<>();
+                data.put("error_message", e.getMessage());
                 response.setContentType(APLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
+                new ObjectMapper().writeValue(response.getOutputStream(), data);
             }
         } else
             throw new RuntimeException("É necessário informar um Refresh token para solicitar a atualização do token.");
+    }
+
+    public void autenticarTokenExistente(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        if (authorizationHeader != null && authorizationHeader.startsWith(ATRIBUTO_PREFIXO)) {
+
+            try {
+                String token = authorizationHeader.substring(ATRIBUTO_PREFIXO.length());
+                Optional<Usuario> usuario = buscarUsuarioViaToken(token);
+                UsuarioDetailsData usuarioDetailsData = new UsuarioDetailsData(usuario);
+                Map<String, Object> data = new HashMap<>();
+                data.put("email", usuarioDetailsData.getUsername());
+                data.put("permissions", usuarioDetailsData.getAuthorities()
+                        .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+                data.put("role", usuarioDetailsData.getUsuario().get().getCargo());
+                response.setContentType(APLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), data);
+            } catch (Exception e) {
+                response.setHeader("error", e.getMessage());
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                Map<String, String> data = new HashMap<>();
+                data.put("error_message", e.getMessage());
+                response.setContentType(APLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), data);
+            }
+        } else {
+            new RuntimeException("Token inexistente");
+        }
+    }
+
+    public Optional<Usuario> buscarUsuarioViaToken(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(JWTFilterAutenticacao.TOKEN_SENHA);
+        JWTVerifier jwtVerifier = JWT.require(algorithm).build();
+        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        String usuarioEmail = decodedJWT.getSubject();
+        return usuarioRepository.findByEmail(usuarioEmail);
     }
 }

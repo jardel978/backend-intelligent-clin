@@ -7,7 +7,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,15 +29,20 @@ import java.util.stream.Collectors;
 public class JWTFilterAutenticacao extends UsernamePasswordAuthenticationFilter {
 
 //    public static final int TOKEN_EXPIRE_AT = 1000 * 30; //30 s (teste)
-//    public static final int REFRESH_TOKEN_EXPIRE_AT = 1000 * 60 * 20; //20 min (teste)
+    //    public static final int REFRESH_TOKEN_EXPIRE_AT = 1000 * 60 * 60 * 24 * 30; //20 min (teste)
     public static final int TOKEN_EXPIRE_AT = 1000 * 60 * 60 * 24 * 7; //1 semana
-    public static final int REFRESH_TOKEN_EXPIRE_AT = 1000 * 60 * 60 * 24 * 30 * 3; //3 meses
+    public static final long REFRESH_TOKEN_EXPIRE_AT = 1000L * 60 * 60 * 24 * 30 * 3; //3 meses
     public static final String APLICATION_JSON_VALUE = "application/json";
-    public static final String TOKEN_SENHA = "ff163f2e-9757-4571-b2bd-a4801de92012";
 
+    public static String TOKEN_SENHA;
 
-    @Autowired
     private AuthenticationManager authenticationManager;
+
+    public JWTFilterAutenticacao(AuthenticationManager authenticationManager, VariavelTokenAssinatura variavelTokenAssinatura) {
+        super(authenticationManager);
+        this.authenticationManager = authenticationManager;
+        TOKEN_SENHA = variavelTokenAssinatura.getTokenAssinatura();
+    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
@@ -78,10 +82,25 @@ public class JWTFilterAutenticacao extends UsernamePasswordAuthenticationFilter 
 
 //        response.setHeader("access_token", access_token);
 //        response.setHeader("refresh_token", refresh_token);
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("access_token", access_token);
-        tokens.put("refresh_token", refresh_token);
+        Map<String, Object> data = new HashMap<>();
+        data.put("token", access_token);
+        data.put("refreshToken", refresh_token);
+        data.put("permissions", usuarioDetailsData.getAuthorities()
+                .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+        data.put("role", usuarioDetailsData.getUsuario().get().getCargo());
         response.setContentType(APLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+        new ObjectMapper().writeValue(response.getOutputStream(), data);
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setHeader("error", "Usuario não encontrado");
+        Map<String, Object> data = new HashMap<>();
+        data.put("exception", failed.getMessage());
+        data.put("message", "Falha na autenticação");
+        data.put("timestamp", new Date());
+        response.setContentType(APLICATION_JSON_VALUE);
+        new ObjectMapper().writeValue(response.getOutputStream(), data);
     }
 }
