@@ -5,7 +5,8 @@ public enum Cargo {
     ESTAGIARIO("estagiario", 1),
     ATENDENTE("atendente", 2),
     GERENTE("gerente", 3),
-    DIRETOR("diretor", 4);
+    DIRETOR("diretor", 4),
+    VIEWER("viewer", 5);
 
     private final String name;
     private final int codigo;

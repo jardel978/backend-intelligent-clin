@@ -28,6 +28,7 @@ public class UsuarioDetailsData implements UserDetails {
         SimpleGrantedAuthority user1 = new SimpleGrantedAuthority("ROLE_USER1");
         SimpleGrantedAuthority user2 = new SimpleGrantedAuthority("ROLE_USER2");
         SimpleGrantedAuthority user3 = new SimpleGrantedAuthority("ROLE_USER3");
+        SimpleGrantedAuthority viewer = new SimpleGrantedAuthority("ROLE_USER_VIEWER");
         if (usuario.isPresent()) {
             if (usuario.get().getCargo() == Cargo.DIRETOR) {
                 authorityUser.add(admin);
@@ -46,6 +47,10 @@ public class UsuarioDetailsData implements UserDetails {
             }
             if (usuario.get().getCargo() == Cargo.ESTAGIARIO) {
                 authorityUser.add(user3);
+            }
+            // a authority de viewer será para o usuário conectar com a aplicação e apenas ver como funciona internamente
+            if (usuario.get().getCargo() == Cargo.VIEWER) {
+                authorityUser.add(viewer);
             }
         }
         return authorityUser;

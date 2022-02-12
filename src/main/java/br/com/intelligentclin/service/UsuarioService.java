@@ -161,17 +161,26 @@ public class UsuarioService {
                 Usuario usuarioDaBase = buscarUsuarioViaToken(token).orElseThrow(() ->
                         new DadoInexistenteException("Usuário não encontrado na base de dados.")
                 );
-
-                if (usuarioDaBase.getCargo() == Cargo.DIRETOR) {
-                    usuarioDaBase.setNome(usuarioDTO.getNome());
-                    usuarioDaBase.setSobrenome(usuarioDTO.getSobrenome());
-                    usuarioDaBase.setCpf(usuarioDTO.getCpf());
-                    usuarioDaBase.setCargo(usuarioDTO.getCargo());
+                if (usuarioDaBase.getCargo() != Cargo.VIEWER) {
+                    if (usuarioDaBase.getCargo() == Cargo.DIRETOR) {
+                        usuarioDaBase.setNome(usuarioDTO.getNome());
+                        usuarioDaBase.setSobrenome(usuarioDTO.getSobrenome());
+                        usuarioDaBase.setCpf(usuarioDTO.getCpf());
+                        usuarioDaBase.setCargo(usuarioDTO.getCargo());
+                    }
+                    usuarioDaBase.setEmail(usuarioDTO.getEmail());
+                    usuarioDaBase.setTelefone(usuarioDTO.getTelefone());
+                    usuarioDaBase.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
+                    usuarioRepository.save(usuarioDaBase);
+                } else {
+                    response.setHeader("error", "Acesso negado");
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    Map<String, String> data = new HashMap<>();
+                    data.put("error_message", "Você não tem acesso para editar essas informações");
+                    response.setContentType(APLICATION_JSON_VALUE);
+                    new ObjectMapper().writeValue(response.getOutputStream(), data);
                 }
-                usuarioDaBase.setEmail(usuarioDTO.getEmail());
-                usuarioDaBase.setTelefone(usuarioDTO.getTelefone());
-                usuarioDaBase.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
-                usuarioRepository.save(usuarioDaBase);
+
             } catch (Exception e) {
                 response.setHeader("error", e.getMessage());
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);

@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class JWTFilterAutenticacao extends UsernamePasswordAuthenticationFilter {
 
-//    public static final int TOKEN_EXPIRE_AT = 1000 * 30; //30 s (teste)
-    //    public static final int REFRESH_TOKEN_EXPIRE_AT = 1000 * 60 * 60 * 24 * 30; //20 min (teste)
+    //    public static final int TOKEN_EXPIRE_AT = 1000 * 30; //30 s (teste)
+//    public static final int REFRESH_TOKEN_EXPIRE_AT = 1000 * 60 * 60 * 24 * 30; //20 min (teste)
     public static final int TOKEN_EXPIRE_AT = 1000 * 60 * 60 * 24 * 7; //1 semana
     public static final long REFRESH_TOKEN_EXPIRE_AT = 1000L * 60 * 60 * 24 * 30 * 3; //3 meses
     public static final String APLICATION_JSON_VALUE = "application/json";
@@ -80,8 +80,6 @@ public class JWTFilterAutenticacao extends UsernamePasswordAuthenticationFilter 
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
 
-//        response.setHeader("access_token", access_token);
-//        response.setHeader("refresh_token", refresh_token);
         Map<String, Object> data = new HashMap<>();
         data.put("token", access_token);
         data.put("refreshToken", refresh_token);

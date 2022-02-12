@@ -1,5 +1,6 @@
 package br.com.intelligentclin.config;
 
+import br.com.intelligentclin.security.CustomAccessDeniedHandler;
 import br.com.intelligentclin.security.JWTFilterAutenticacao;
 import br.com.intelligentclin.security.JWTFilterValidacao;
 import br.com.intelligentclin.security.VariavelTokenAssinatura;
@@ -38,6 +39,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private VariavelTokenAssinatura variavelTokenAssinatura;
 
+    @Autowired
+    private CustomAccessDeniedHandler customAccessDeniedHandler;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(usuarioDetailsService).passwordEncoder(passwordEncoder);
@@ -52,14 +56,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(//permitido a estagiário
                 GET, "/pacientes/permitAll/**", "/enderecos/permitAll/**", "/dentistas/permitAll/**", "/prontuarios/permitAll/**", "/consultas/permitAll/**",
                 "/usuarios/permitAll/**", "/files/permitAll/**"
-        ).hasAnyAuthority("ROLE_USER3");
+        ).hasAnyAuthority("ROLE_USER3", "ROLE_USER_VIEWER");
         http.authorizeRequests().antMatchers(//permitidos a diretor, gerente, atendente
                 GET, "/pacientes/**", "/enderecos/**", "/dentistas/**", "/prontuarios/**", "/consultas/**",
                 "/files/**"
-        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1", "ROLE_USER2");
+        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1", "ROLE_USER2", "ROLE_USER_VIEWER");
         http.authorizeRequests().antMatchers(//permitido a diretor e gerente
                 GET, "/usuarios/**"
-        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1");
+        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_USER1", "ROLE_USER_VIEWER");
 
         // permissões para solicitações tipo POST
         http.authorizeRequests().antMatchers(//permitidos a estagiário
@@ -96,16 +100,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(new JWTFilterAutenticacao(authenticationManagerBean(), variavelTokenAssinatura));
         http.addFilterBefore(new JWTFilterValidacao(), UsernamePasswordAuthenticationFilter.class);
+        http.exceptionHandling().accessDeniedHandler(customAccessDeniedHandler);
     }
-
-
-//    @Bean
-//    CorsConfigurationSource corsConfiguration() {
-//        final UrlBasedCorsConfigurationSource urlBasedCorsSource = new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
-//        urlBasedCorsSource.registerCorsConfiguration("/**", corsConfiguration);
-//        return urlBasedCorsSource;
-//    }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
